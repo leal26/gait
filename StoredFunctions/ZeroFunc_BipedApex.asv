@@ -66,6 +66,7 @@ function [residual, T,Y,P,Y_EVENT,TE] = ZeroFunc_BipedApex(X, SMA_L, SMA_R)
     Y_EVENT = zeros(4,8);
 
     for i = 1:5 %Integrate motion i/4
+        disp(i)
         % Figure out the current contact configuration (this is used in the
         % dynamics function)
         t_ = (T_START+tEVENT(i))/2;
@@ -94,6 +95,32 @@ function [residual, T,Y,P,Y_EVENT,TE] = ZeroFunc_BipedApex(X, SMA_L, SMA_R)
         else   
             counter = 1;
             [T_PART,Y_PART, out] = ode45(@(t,y) ode(t,y,SMA_L, SMA_R),[T_START,tEVENT(i)],Y_START,options);
+            if i == 1
+                save('data.mat', 'SMA_L', 'SMA_R')
+            else
+                old_SMA_L = SMA_L;
+                old_SMA_R = SMA_R;
+                load('data.mat', 'SMA_L', 'SMA_R')
+                SMA_L.eps = [old_SMA_L.eps; SMA_L.eps];
+                SMA_L.T = [old_SMA_L.T; SMA_L.T];
+                SMA_L.sigma = [old_SMA_L.sigma; SMA_L.sigma];
+                SMA_L.MVF = [old_SMA_L.MVF; SMA_L.MVF];
+                SMA_L.eps_t = [old_SMA_L.eps_t; SMA_L.eps_t];
+                SMA_L.E = [old_SMA_L.E; SMA_L.E];
+                SMA_L.MVF_r = [old_SMA_L.MVF_r; SMA_L.MVF_r];
+                SMA_L.eps_t_r = [old_SMA_L.eps_t_r; SMA_L.eps_t_r];
+                SMA_L.H_cur = [old_SMA_L.H_cur; SMA_L.H_cur];
+                data.T =T;
+                data.sigma = sigma;
+                data.MVF = MVF;
+                data.eps_t = eps_t;
+                data.E = E;
+                data.MVF_r = MVF_r;
+                data.eps_t_r = eps_t_r;
+                data.H_cur = H_cur;
+                data.Phi_fwd = Phi_fwd;
+                data.Phi_rev = Phi_rev;
+            end
         end   
         %************************
        
@@ -196,14 +223,10 @@ function [residual, T,Y,P,Y_EVENT,TE] = ZeroFunc_BipedApex(X, SMA_L, SMA_R)
             % non-dimensional displacement equal strain
             counter = counter + 1;
             u = (1-y/cos(alphaL));
-            if u > 0
-                SMA_L.eps = u/10;
-            else
-                SMA_L.eps = 0;
-            end
+            SMA_L.eps = u;
             SMA_L.T = SMA_L.T_function(t);
             [SMA_L] = OneD_SMA_Model(SMA_L);
-            F_sma = SMA_L.area*SMA_L.sigma; % k*SMA_L.eps;
+            F_sma = SMA_L.area*SMA_L.sigma/SMA_L.norm; % k*SMA_L.eps;
             fprintf('Left: %d, %d, %d, %d\n', t, SMA_L.eps, SMA_L.area*SMA_L.sigma, k*SMA_L.eps)
             Fx = Fx - F_sma*sin(alphaL);
             Fy = Fy + F_sma*cos(alphaL);
@@ -212,14 +235,10 @@ function [residual, T,Y,P,Y_EVENT,TE] = ZeroFunc_BipedApex(X, SMA_L, SMA_R)
             % non-dimensional displacement equal strain
             u = (1-y/cos(alphaR));
             counter = counter + 1;
-            if u > 0
-                SMA_R.eps = u/10;
-            else
-                SMA_R.eps = 0;
-            end
+            SMA_R.eps = u;
             SMA_R.T = SMA_R.T_function(t);
             [SMA_R] = OneD_SMA_Model(SMA_R);
-            F_sma = SMA_L.area*SMA_L.sigma;% F_sma = k*SMA_R.eps/10;  
+            F_sma = SMA_R.area*SMA_R.sigma/SMA_R.norm;% F_sma = k*SMA_R.eps/10;  
             fprintf('Right: %d, %d, %d, %d\n', t, SMA_R.eps, SMA_R.area*SMA_R.sigma, k*SMA_R.eps)
             Fx = Fx - F_sma*sin(alphaR);
             Fy = Fy + F_sma*cos(alphaR);

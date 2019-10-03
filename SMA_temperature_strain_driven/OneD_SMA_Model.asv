@@ -46,9 +46,9 @@ integration_scheme = 'I';
 % P.eps = eps;
 % P.T =T;
 P.sigma = sigma(end);
-P.MVF = MVF(end);
-P.eps_t = eps_t(end);
-P.E = E(end);
+P.MVF = MVF;
+P.eps_t = eps_t;
+P.E = E;
 
 if strcmp(to_plot,'True')
     figure()

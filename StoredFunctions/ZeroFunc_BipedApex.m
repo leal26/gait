@@ -197,27 +197,30 @@ function [residual, T,Y,P,Y_EVENT,TE] = ZeroFunc_BipedApex(X, SMA_L, SMA_R)
             % non-dimensional displacement equal strain
             counter = counter + 1;
             u = (1-y/cos(alphaL));
-            SMA_L.eps = u;
+            SMA_L.eps = u*20/1.138989e+04;
             SMA_L.T = SMA_L.T_function(t);
             [SMA_L] = OneD_SMA_Model(SMA_L);
             F_sma = SMA_L.area*SMA_L.sigma/SMA_L.norm; % k*SMA_L.eps;
-            fprintf('Left: %d, %d, %d, %d\n', t, SMA_L.eps, SMA_L.area*SMA_L.sigma, k*SMA_L.eps)
+            fprintf('Left: %d, %d, %d, %d\n', t, SMA_L.eps, SMA_L.area*SMA_L.sigma/SMA_L.norm/u, k)
             Fx = Fx - F_sma*sin(alphaL);
             Fy = Fy + F_sma*cos(alphaL);
+            store(SMA_L, 0)
         end
         if contactR
             % non-dimensional displacement equal strain
             u = (1-y/cos(alphaR));
             counter = counter + 1;
-            SMA_R.eps = u;
+            SMA_R.eps = u*20/1.138989e+04;
             SMA_R.T = SMA_R.T_function(t);
             [SMA_R] = OneD_SMA_Model(SMA_R);
             F_sma = SMA_R.area*SMA_R.sigma/SMA_R.norm;% F_sma = k*SMA_R.eps/10;  
-            fprintf('Right: %d, %d, %d, %d\n', t, SMA_R.eps, SMA_R.area*SMA_R.sigma, k*SMA_R.eps)
+            fprintf('Right: %d, %d, %d, %d\n', t, SMA_R.eps, SMA_R.area*SMA_R.sigma/SMA_R.norm/u, k)
             Fx = Fx - F_sma*sin(alphaR);
             Fy = Fy + F_sma*cos(alphaR);
+            store(0, SMA_R)
         end
 
+        
         % Compute main body acceleration:
         ddx = Fx;
         ddy = Fy-1;
