@@ -1,0 +1,9 @@
+length_leg = linspace(.5,1);
+length_sma_original = linspace(.1,1);
+[L,S] = meshgrid(length_leg ,length_sma_original);
+
+length_arm = sqrt(S.^2+1)/2;
+sma_strain = mechanism(L, length_arm, S);
+contourf(L,S,sma_strain,10)
+colorbar('SMA strain')
+xlabel('D')

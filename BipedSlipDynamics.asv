@@ -1,24 +1,21 @@
-path(pathdef)
-CurrentPath = pwd;
-addpath(CurrentPath)
-addpath([CurrentPath,filesep,'inputs;'])
-addpath([CurrentPath,filesep,'Graphics;'])
-addpath([CurrentPath,filesep,'BipedalGaits;'])
-addpath([CurrentPath,filesep,'StoredFunctions;'])
-addpath([CurrentPath,filesep,'SMA_temperature_strain_driven;'])
-close all; clc;
 %% (a) Define input parameters
-
-IP.phase = 0.;
-IP.duty = 1.;
+IP.phase = .10;
+IP.duty = .50;
 IP.frequency = 1;
-IP.amplitude = 700;
-IP.mass = 10; % kg (used for normalizing)
-IP.gravity = 9.80665; % m/s2 (used for normalizing)
+IP.amplitude = 500;
+
 [SMA_L, SMA_R] = define_SMA(IP, IP);
 
 %% (a) Display a stored solution
+path(pathdef)
+CurrentPath = pwd;
+addpath(CurrentPath)
+addpath([CurrentPath,filesep,'BipedalGaits;'])
+addpath([CurrentPath,filesep,'Graphics;'])
+addpath([CurrentPath,filesep,'StoredFunctions;'])
+addpath([CurrentPath,filesep,'SMA_temperature_strain_driven;'])
 load('R2_v1_ALL.mat');
+close all; clc;
 k = 150;
 xCYC = config(:,k);
 
@@ -26,7 +23,7 @@ xCYC = config(:,k);
 [residual, T,Y,P,Y_EVENT,TE] = ZeroFunc_BipedApex(xCYC, SMA_L, SMA_R);
 ShowTrajectory(T,Y,P,'Test')
 
-% [residual, T,Y,P,Y_EVENT,TE] = ZeroFunc_BipedApex(xCYC, SMA_L, SMA_R);
+[residual, T,Y,P,Y_EVENT,TE] = ZeroFunc_BipedApex(xCYC, SMA_L, SMA_R);
 figure(2)
 plot(T,Y,'LineWidth',2)
 grid on; box on
