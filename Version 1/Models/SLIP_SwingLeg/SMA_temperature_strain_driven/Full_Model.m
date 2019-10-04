@@ -129,8 +129,13 @@ data.eps = eps;
 data.T =T;
 data.sigma = sigma;
 data.MVF = MVF;
+data.E = E;
 data.eps_t = eps_t;
-
+data.MVF_r = MVF_r;
+data.eps_t_r = eps_t_r;
+data.H_cur = H_cur;
+data.Phi_fwd = Phi_fwd;
+data.Phi_rev = Phi_rev;
 % save('data.mat', 'eps', 'T','sigma','MVF', 'eps_t', 'E', 'MVF_r', 'eps_t_r', 'H_cur', 'Phi_fwd', 'Phi_rev')
 end
 

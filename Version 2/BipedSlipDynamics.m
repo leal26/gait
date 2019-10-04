@@ -28,7 +28,7 @@ xCYC = config(:,k);
 % Show animation
 figure(50)
 hold on;
-[residual, T,Y,P,Y_EVENT,TE] = ZeroFunc_BipedApex(xCYC, SMA_L, SMA_R);
+[T,Y,P,Y_EVENT] = ZeroFunc_BipedApex(xCYC, SMA_L, SMA_R);
 ShowTrajectory(T,Y,P,'Test')
 %%
 figure(10)

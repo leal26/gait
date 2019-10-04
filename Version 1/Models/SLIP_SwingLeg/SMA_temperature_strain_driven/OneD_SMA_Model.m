@@ -1,4 +1,4 @@
-function [P]=OneD_SMA_Model(P) %k, T_inp, eps_i,
+function [P]=OneD_SMA_Model(k, P) %k, T_inp, eps_i,
 %  [sigma, MVF, T, eps_t, eps, E, H_cur]=OneD_SMA_Model(k, eps_current, T, MVF_init, eps_t_0, sigma_0, eps_0,n, to_plot) 
 % Modified Edwins original code to calculate just for a given T and eps
 % Ideal: [sigma, MVF]=OneD_SMA_Model(T_inp, esp_inp)
@@ -9,10 +9,8 @@ function [P]=OneD_SMA_Model(P) %k, T_inp, eps_i,
 %         - n: Maximum Number of increments n per loading step
 %         - plot: 'True' or 'False'
 
-global counter
 global data
 % Initial material conditions
-k = counter;
 MVF_init = P.MVF_init;
 eps_t_0 = P.eps_t_0;
 sigma_0 = P.sigma_0;
@@ -46,9 +44,9 @@ integration_scheme = 'I';
 % P.eps = eps;
 % P.T =T;
 P.sigma = sigma(end);
-P.MVF = MVF;
-P.eps_t = eps_t;
-P.E = E;
+P.MVF = MVF(end);
+P.eps_t = eps_t(end);
+P.E = E(end);
 
 if strcmp(to_plot,'True')
     figure()

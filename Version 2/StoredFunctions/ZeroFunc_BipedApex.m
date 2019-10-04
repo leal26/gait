@@ -1,4 +1,4 @@
-function [residual, T,Y,P,Y_EVENT,TE] = ZeroFunc_BipedApex(X, SMA_L, SMA_R)
+function [T,Y,P,Y_EVENT,TE] = ZeroFunc_BipedApex(X, SMA_L, SMA_R)
     global counter
     %**********************************************************************
     % General Preparation
@@ -17,38 +17,6 @@ function [residual, T,Y,P,Y_EVENT,TE] = ZeroFunc_BipedApex(X, SMA_L, SMA_R)
     dalphaL0 = X(5);
     alphaR0  = X(6);
     dalphaR0 = X(7);
-    % Event timing:
-    tL_TD    = X(8);
-    tL_LO    = X(9);
-    tR_TD    = X(10);
-    tR_LO    = X(11);
-    tAPEX    = X(12);
-    
-    % Move all timing values into [0..tR_TD]
-    while tL_TD < 0
-         tL_TD = tL_TD + tAPEX;
-    end
-    while tL_TD > tAPEX
-         tL_TD = tL_TD - tAPEX;
-    end 
-    while tL_LO < 0
-         tL_LO = tL_LO + tAPEX;
-    end
-    while tL_LO > tAPEX
-         tL_LO = tL_LO - tAPEX;
-    end 
-    while tR_TD < 0
-         tR_TD = tR_TD + tAPEX;
-    end
-    while tR_TD > tAPEX
-         tR_TD = tR_TD - tAPEX;
-    end 
-    while tR_LO < 0
-         tR_LO = tR_LO + tAPEX;
-    end
-    while tR_LO > tAPEX
-         tR_LO = tR_LO - tAPEX;
-    end
     
     %**********************************************************************
     % Integration
@@ -66,20 +34,6 @@ function [residual, T,Y,P,Y_EVENT,TE] = ZeroFunc_BipedApex(X, SMA_L, SMA_R)
     Y_EVENT = zeros(4,8);
 
     for i = 1:5 %Integrate motion i/4
-        disp(i)
-        % Figure out the current contact configuration (this is used in the
-        % dynamics function)
-        t_ = (T_START+tEVENT(i))/2;
-        if ((t_>tL_TD && t_<tL_LO && tL_TD<tL_LO) || ((t_<tL_LO || t_>tL_TD) && tL_TD>tL_LO))
-            contactL = true;
-        else
-            contactL = false;
-        end
-        if ((t_>tR_TD && t_<tR_LO && tR_TD<tR_LO) || ((t_<tR_LO || t_>tR_TD) && tR_TD>tR_LO))
-            contactR = true;
-        else
-            contactR = false;
-        end
         % Set up solver
   
         %************************
@@ -94,7 +48,7 @@ function [residual, T,Y,P,Y_EVENT,TE] = ZeroFunc_BipedApex(X, SMA_L, SMA_R)
             T_PART = T_START;
         else   
             counter = 1;
-            [T_PART,Y_PART, out] = ode45(@(t,y) ode(t,y,SMA_L, SMA_R),[T_START,tEVENT(i)],Y_START,options);
+            [T_PART,Y_PART, out] = ode23s(@(t,y) ode(t,y,SMA_L, SMA_R),[T_START,tEVENT(i)],Y_START,options);
         end   
         %************************
        
@@ -127,7 +81,7 @@ function [residual, T,Y,P,Y_EVENT,TE] = ZeroFunc_BipedApex(X, SMA_L, SMA_R)
   
   
     %**********************************************************************
-    % Compute Residuals
+    % Output variables
     %**********************************************************************
     % Relabel event values:
     YL_TD = Y_EVENT(1,:)';
@@ -136,41 +90,8 @@ function [residual, T,Y,P,Y_EVENT,TE] = ZeroFunc_BipedApex(X, SMA_L, SMA_R)
     YR_LO = Y_EVENT(4,:)';
     YAPEX = Y_EVENT(5,:)';
     
-    % Compute residuals
-    % Periodicity:
-    residual = zeros(15,1);
-
-    IS_FullStride = true;
-    if IS_FullStride == 1 % Switch leg angles and velocities
-        residual(1:7) = Y(1,2:8).' - YAPEX(2:8);
-    else
-        residual(1:3) = Y(1,2:4).' - YAPEX(2:4);
-        residual(4:5) = Y(1,7:8).' - YAPEX(5:6);
-        residual(6:7) = Y(1,5:6).' - YAPEX(7:8);
-    end
-
-    % At the touch-down events, the feet have to be on the ground:
-    residual(8)   = YL_TD(3) -  cos(YL_TD(5));
-    residual(9)   = YR_TD(3) -  cos(YR_TD(7));
-    % At the lift-off events, the feet also have to be on the ground:
-    residual(10)  = YL_LO(3) -  cos(YL_LO(5));
-    residual(11)  = YR_LO(3) -  cos(YR_LO(7));
-%     residual(12)  = YL_TD(5) -  YR_TD(7); % Symmetrical
-    residual(13)  = YL_TD(5) +  YR_LO(7); % Symmetrical
-    residual(14)  = YR_TD(7) +  YL_LO(5); % Symmetrical
-    residual(15)  = YAPEX(4);
-    
     if nargout > 1
        P  = [tL_TD,tL_LO,tR_TD,tR_LO,tAPEX,k,omega]; 
-       dll = 0;
-       dlr = 0;
-       if contactL
-           dll = (1- YAPEX(3)/cos(YAPEX(5)));
-       end
-       if contactR
-           dlr = (1- YAPEX(3)/cos(YAPEX(7)));
-       end
-       TE = 1/2*(YAPEX(2)^2 + YAPEX(4)^2) + YAPEX(3) + 1/2*k*(dll^2 +dlr^2);
     end
     
     %**********************************************************************
@@ -205,6 +126,8 @@ function [residual, T,Y,P,Y_EVENT,TE] = ZeroFunc_BipedApex(X, SMA_L, SMA_R)
             Fx = Fx - F_sma*sin(alphaL);
             Fy = Fy + F_sma*cos(alphaL);
             store(SMA_L, 0)
+            scatter(t, F_sma,[],'b')
+            drawnow() 
         end
         if contactR
             % non-dimensional displacement equal strain
@@ -218,6 +141,8 @@ function [residual, T,Y,P,Y_EVENT,TE] = ZeroFunc_BipedApex(X, SMA_L, SMA_R)
             Fx = Fx - F_sma*sin(alphaR);
             Fy = Fy + F_sma*cos(alphaR);
             store(0, SMA_R)
+            scatter(t, F_sma,[],'r')
+            drawnow() 
         end
 
         
