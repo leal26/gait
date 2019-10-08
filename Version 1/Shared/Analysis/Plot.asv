@@ -1,7 +1,7 @@
 
 %Calculates the contact forces after simulation
 
-function contactF = ContactForces(y, z, p, t, SMA_L, SMA_R)
+function contactF = Plot(y, z, p, t, SMA_L, SMA_R)
 global SMA_L_database
 global SMA_R_database
 

@@ -181,16 +181,15 @@ solveOptions.tMAX = 10;
 %% (c) Display the solution:
 SMA_L_database = [];
 SMA_R_database = [];
-pCYC(systParamIndices.k) = 20; % Stance leg stiffness
+pCYC(systParamIndices.k) = NaN; % Stance leg stiffness
 
 figure(1)
 simOptions.tMAX = 5; 
 recOUTPUT = RecordStateCLASS();
 [yOUT, zOUT, tOUT, recOUTPUT] = HybridDynamics(yCYC, zCYC, pCYC, SMA_L, SMA_R, recOUTPUT, simOptions);
-simRES = recOUTPUT.retrieve();
 % Define which states are plotted:
 plotStates = [ contStateIndices.x, contStateIndices.dx,contStateIndices.y, contStateIndices.dy, contStateIndices.phiL, contStateIndices.dphiL,contStateIndices.phiR, contStateIndices.dphiR];
-plot(simRES.t,simRES.continuousStates(plotStates,:))
+plot(yOUT(:,end),yOUT(:,plotStates))
 legend(simRES.continuousStateNames(plotStates));
 ContactForces(simRES.continuousStates(:,:),simRES.discreteStates(:,:),pCYC,simRES.t, SMA_L, SMA_R);
 

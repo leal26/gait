@@ -152,19 +152,27 @@ function [yOUT, zOUT, tOUT, varargout] = HybridDynamics(yIN, zIN, p, SMA_L, SMA_
     % I suspect there are some zeno effect that keep happening during the
     % integration; so I add a flag to count the total number of events
     % occured during the simulation.
+    index = 1;
+    yOUT = NaN(1000, length(yIN));
+    zOUT = NaN(1000, length(zIN));;
+    tOUT = NaN(1000);
+    yOUT(index,:) = yIN;
+    zOUT(index,:) = zIN;
+    tOUT(index) = tOUT(1:index);
     NoE=0;
+    time_step = .1;
     
     while ~isTerminal
         % Integrate until the next event, maximally for tMAX:
         if isempty(outputIN)
-            tspan = [tIN,tMAX];
+            tspan = [tIN,tIN+time_step];
         else
-            tspan = outputIN.getTimeVector(tIN,tMAX); 
+            tspan = outputIN.getTimeVector(tIN,tIN+time_step); 
         end
         % NOTE: even though ode45 is provided with an initial column guess,
         % the results are stored in rows.
         [t,y,teOUT,yeOUT,ieOUT] = ode45(@(t,y) ODE(t,y,SMA_L,SMA_R),tspan,yIN,odeOPTIONS);
-        
+
         if abs(t(end)-tMAX)<1e-9
             % Time boundary is reached
             yIN = y(end,:)';  % This will be mapped to yOUT below.
@@ -173,14 +181,14 @@ function [yOUT, zOUT, tOUT, varargout] = HybridDynamics(yIN, zIN, p, SMA_L, SMA_
             break;  
         end    
         
-        if isempty(ieOUT)        
-            % No event occurred. The simulation ran out of time without
-            % reaching the terminating event. Map final continuous states
-            % (discrete states were not altered) and set time to -1:
-            yIN = y(end,:)';  % This will be mapped to yOUT below.
-            tIN = -1;
-            break;    
-        else
+%         if isempty(ieOUT)        
+%             % No event occurred. The simulation ran out of time without
+%             % reaching the terminating event. Map final continuous states
+%             % (discrete states were not altered) and set time to -1:
+%             yIN = y(end,:)';  % This will be mapped to yOUT below.
+%             tIN = -1;
+%             break;    
+        if ~isempty(ieOUT)
             % Handle the discrete change of states at events by calling the
             % jump map (which must be on the MATLAB search path): 
 
@@ -188,21 +196,28 @@ function [yOUT, zOUT, tOUT, varargout] = HybridDynamics(yIN, zIN, p, SMA_L, SMA_
 
             tIN = teOUT(end);
 
-        end   
-        
+        end  
+
+        % Map states for return values
+        index = index + 1;
+        yOUT(index,:) = y(end,:);
+        zOUT(index,:) = zIN;
+        tOUT(index) = tIN;
+    
+        tIN = tIN + time_step;
+        yIN = y(end,:).';
         NoE=NoE+1;
         
-        if NoE> 12   
+        if NoE> 1000
             % incorrect footfall sequences, terminate integration;
             break;
         end
             
     end
     
-    % Map states for return values
-    yOUT = yIN;
-    zOUT = zIN;
-    tOUT = tIN;
+    yOUT = yOUT(1:index,:);
+    zOUT = zOUT(1:index,:);
+    tOUT = tOUT(1:index);
     if nargout == 4
         varargout(1) = {outputIN};
     else

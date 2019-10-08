@@ -87,7 +87,7 @@ function dydt = FlowMap(t, y, z, p, SMA_L, SMA_R, varargin)
                 SMA_L.T = SMA_L.T_function(t);
                 [SMA_L] = OneD_SMA_Model(counter, SMA_L);
                 F_sma = SMA_L.area*SMA_L.sigma/SMA_L.norm;% F_sma = k*SMA_R.eps/10;  
-                fprintf('Right: %d, %d, %d\n', t, SMA_L.eps, SMA_L.area*SMA_L.sigma/SMA_L.norm/u)
+                % fprintf('Right: %d, %d, %d\n', t, SMA_L.eps, SMA_L.area*SMA_L.sigma/SMA_L.norm/u)
                 Fl=F_sma;
                 store(SMA_L, 0)
             else
@@ -110,7 +110,7 @@ function dydt = FlowMap(t, y, z, p, SMA_L, SMA_R, varargin)
                 SMA_R.T = SMA_R.T_function(t);
                 [SMA_R] = OneD_SMA_Model(counter, SMA_R);
                 F_sma = SMA_R.area*SMA_R.sigma/SMA_R.norm;% F_sma = k*SMA_R.eps/10;  
-                fprintf('Right: %d, %d, %d, %d\n', t, SMA_R.eps, 20*(r_legL-LegR), F_sma)
+                % fprintf('Right: %d, %d, %d, %d\n', t, SMA_R.eps, 20*(r_legL-LegR), F_sma)
                 Fr=F_sma;
                 store(0, SMA_R)
             else
