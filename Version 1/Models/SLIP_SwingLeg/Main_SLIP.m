@@ -181,7 +181,7 @@ solveOptions.tMAX = 10;
 %% (c) Display the solution:
 SMA_L_database = [];
 SMA_R_database = [];
-pCYC(systParamIndices.k) = NaN; % Stance leg stiffness
+pCYC(systParamIndices.k) = 20; % Stance leg stiffness
 
 figure(1)
 simOptions.tMAX = 5; 

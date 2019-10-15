@@ -160,7 +160,7 @@ function [yOUT, zOUT, tOUT, varargout] = HybridDynamics(yIN, zIN, p, SMA_L, SMA_
     zOUT(index,:) = zIN;
     tOUT(index) = tOUT(1:index);
     NoE=0;
-    time_step = .1;
+    time_step = .01;
     
     while ~isTerminal
         % Integrate until the next event, maximally for tMAX:
@@ -218,6 +218,8 @@ function [yOUT, zOUT, tOUT, varargout] = HybridDynamics(yIN, zIN, p, SMA_L, SMA_
     yOUT = yOUT(1:index,:);
     zOUT = zOUT(1:index,:);
     tOUT = tOUT(1:index);
+%     disp(yOUT)
+%     disp(length(yOUT))
     if nargout == 4
         varargout(1) = {outputIN};
     else

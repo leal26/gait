@@ -336,9 +336,11 @@ function [yCYC, zCYC, pCYC, varargout] = FindPeriodicSolution(hybrDynHndl, yINIT
         % Periodicity as required by the user:
         [yIN_, zIN_] = MapXtoYZPS(x_);
         % Periodicity as required by the user:
-        [yIN_, zIN_] = MapXtoYZPS(x_);
-        ceq_ = [yOUT_(yPERIOD == 1) - yIN_(yPERIOD == 1);... 
-                zOUT_(zPERIOD == 1) - zIN_(zPERIOD == 1)];    
+        % [yIN_, zIN_] = MapXtoYZPS(x_);
+        % disp(yIN_)
+        % disp(yOUT_(yPERIOD == 1,:))
+        % disp(zOUT_(yPERIOD == 1,:))
+        ceq_ = yOUT_(yPERIOD == 1,:) - yIN_(yPERIOD == 1);    
     end
 
 
