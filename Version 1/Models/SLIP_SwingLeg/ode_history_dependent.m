@@ -1,4 +1,4 @@
-function [t, y] = ode_history_dependent(F_ty, n_steps, t_span, y_initial)
+function [t, y] = ode_history_dependent(F_ty, n_steps, t_span, y_initial, Events)
 %4th order Runge-Kutta integration routine for history dependent functions
 % F_ty()
 %Input custom values and custom first-order differential equation
@@ -24,8 +24,11 @@ elseif nargin(F_ty) == 3
     t=t_span(1):h:t_span(2);
     y=zeros(length(y_initial),length(t));
     y(:,1)=y_initial;
+    prev_teOUT = [-1 -1 -1 -1 -1 -1];
+    done = false;
+    disp('here')
     for i=1:(length(t)-1)
-
+        disp(i)
         k1 = F_ty(t(i),y(:,i),t(i-1));
         k2 = F_ty(t(i)+0.5*h,y(:,i)+0.5*h*k1);
         k3 = F_ty((t(i)+0.5*h),(y(:,i)+0.5*h*k2));
@@ -33,6 +36,22 @@ elseif nargin(F_ty) == 3
 
 
         y(:,i+1) = y(:,i) + (1/6)*(k1+2*k2+2*k3+k4)*h;
+        [teOUT,~,~] = Events(0,y(:,i+1));
+        inflections = sign(prev_teOUT).*sign(teOUT);
+        disp(prev_teOUT)
+        disp('here')
+        disp(teOUT)
+        for j=1:length(inflections)
+            if inflections(j) <= 0
+                done = true;
+            end
+        end
+        prev_teOUT = teOUT;
+        if done
+            y = y(:,1:i);
+            t = t(:,1:i);
+            break
+        end
     end
 end
 %Checking custom routine and MATLAB function ode45
@@ -50,3 +69,10 @@ end
 % err = immse(y,y_c2)
 end
 
+% *********************************************************************
+% Event Detection   
+function [value_,isterminal_,direction_] = find_inflection()
+
+end
+% End Event Detection
+% *********************************************************************

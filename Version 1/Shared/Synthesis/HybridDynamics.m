@@ -164,31 +164,10 @@ function [yOUT, zOUT, tOUT, varargout] = HybridDynamics(yIN, zIN, p, SMA_L, SMA_
         % NOTE: even though ode45 is provided with an initial column guess,
         % the results are stored in rows.
         % [t,y,teOUT,yeOUT,ieOUT] = ode_history_dependent(@(t,y) ODE(t,y,SMA_L,SMA_R),tspan,yIN,odeOPTIONS);
-        [t,y] = ode_history_dependent(@(t,y) ODE(t,y,SMA_L,SMA_R),2000, tspan,yIN);
-        prev_teOUT = [-1 -1 -1 -1 -1 -1];
-        index = 2000;
-        for i=1:2000
-            [teOUT,yeOUT,ieOUT] = Events(0,y(:,i));
-            inflections = sign(prev_teOUT).*sign(teOUT);
-            for j=1:length(inflections)
-                if inflections(j) <= 0
-                    index = i;
-                    break
-                end
-            end
-            if index ~= 2000
-                break
-            end
-            prev_teOUT = teOUT;
-        end
-        disp(index)
-        disp(size(y))
-        t = t(1:index);
-        y = y(:, 1:index);
+        [t,y] = ode_history_dependent(@(t,y) ODE(t,y,SMA_L,SMA_R),2000, tspan,yIN, @Events);
+
         figure
-        plot(t,y(2,:))
-        [teOUT,yeOUT,ieOUT] = Events(0,y);
-        disp(teOUT)
+        plot(t,y)
         BREAK
         if abs(t(end)-tMAX)<1e-9
             % Time boundary is reached
