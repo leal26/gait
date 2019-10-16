@@ -112,7 +112,7 @@ function [yOUT, zOUT, tOUT, varargout] = HybridDynamics(yIN, zIN, p, SMA_L, SMA_
     if (nargin>5) && (isa(varargin{end},'struct')) && ~(nargin == 9 && isa(varargin{3}, 'function_handle'))
         options = varargin{end};
     end
-    disp(options)
+
     % Evaluate options:
     if isfield(options,'tMAX')
         tMAX = options.tMAX;
@@ -156,7 +156,6 @@ function [yOUT, zOUT, tOUT, varargout] = HybridDynamics(yIN, zIN, p, SMA_L, SMA_
     NoE=0;
     
     while ~isTerminal
-        fprintf('tIN: %f\n',tIN)
         % Integrate until the next event, maximally for tMAX:
         if isempty(outputIN)
             tspan = [tIN,tMAX];
@@ -170,11 +169,6 @@ function [yOUT, zOUT, tOUT, varargout] = HybridDynamics(yIN, zIN, p, SMA_L, SMA_
         % tspan = [0 5];
 
         [t,y,teOUT,yeOUT,ieOUT] = ode_history_dependent(@(t,y) ODE(t,y,SMA_L,SMA_R),outputIN.rate, tspan, yIN, @Events, @OutputFcn);
-        disp(outputIN)
-        fprintf('%f %f\n', min(t), max(t))
-%          figure
-%          plot(t,y)
-%          BREAK
         if abs(t(end)-tMAX)<1e-9
             % Time boundary is reached
             yIN = y(end,:)';  % This will be mapped to yOUT below.
