@@ -184,7 +184,7 @@ function [yOUT, zOUT, tOUT, varargout] = HybridDynamics(yIN, zIN, p, SMA_L, SMA_
         disp(index)
         disp(size(y))
         t = t(1:index);
-        y = y(:, 1:index);
+        y = y(:, prev_teOUT);
         figure
         plot(t,y(2,:))
         [teOUT,yeOUT,ieOUT] = Events(0,y);
