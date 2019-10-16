@@ -60,6 +60,7 @@ function [yPLUS, zPLUS, isTerminal] = JumpMap(yMINUS, zMINUS, p, event)
     % As most things remain unchanged we copy the incoming states
     yPLUS = yMINUS;
     zPLUS = zMINUS;
+    
     phiL=yMINUS(contStateIndices.phiL);
     phiR=yMINUS(contStateIndices.phiR);
     alpha=yMINUS(contStateIndices.alpha);

@@ -163,14 +163,8 @@ function [yOUT, zOUT, tOUT, varargout] = HybridDynamics(yIN, zIN, p, SMA_L, SMA_
         end
         % NOTE: even though ode45 is provided with an initial column guess,
         % the results are stored in rows.
-        % [t,y,teOUT,yeOUT,ieOUT] = ode_history_dependent(@(t,y) ODE(t,y,SMA_L,SMA_R),tspan,yIN,odeOPTIONS);
-        tspan = [0 5];
-        [t,y,teOUT,yeOUT,ieOUT] = ode_history_dependent(@(t,y) ODE(t,y,SMA_L,SMA_R),20000, tspan,yIN, @Events);
+        [t,y,teOUT,yeOUT,ieOUT] = ode45(@(t,y) ODE(t,y,SMA_L,SMA_R),tspan,yIN,odeOPTIONS);
         
-        disp(ieOUT)
-%          figure
-%          plot(t,y)
-%          BREAK
         if abs(t(end)-tMAX)<1e-9
             % Time boundary is reached
             yIN = y(end,:)';  % This will be mapped to yOUT below.
@@ -190,7 +184,7 @@ function [yOUT, zOUT, tOUT, varargout] = HybridDynamics(yIN, zIN, p, SMA_L, SMA_
             % Handle the discrete change of states at events by calling the
             % jump map (which must be on the MATLAB search path): 
 
-                [yIN, zIN, isTerminal] = JumpMap(yeOUT', zIN, p, ieOUT(end));   
+                [yIN, zIN, isTerminal] = JumpMap(yeOUT(end,:)', zIN, p, ieOUT(end));   
 
             tIN = teOUT(end);
 

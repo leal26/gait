@@ -1,0 +1,155 @@
+% *************************************************************************
+%
+% README 
+%
+% Please also consult the theoretical documentation provided in the paper 
+% given below
+%
+%
+% Created by C. David Remy on 03/14/2011
+%
+% Documentation:
+%  'A MATLAB Framework For Gait Creation', 2011, C. David Remy (1), Keith
+%  Buffinton (2), and Roland Siegwart (1),  International Conference on
+%  Intelligent Robots and Systems, September 25-30, San Francisco, USA 
+%
+% (1) Autonomous Systems Lab, Institute of Robotics and Intelligent Systems, 
+%     Swiss Federal Institute of Technology (ETHZ) 
+%     Tannenstr. 3 / CLA-E-32.1
+%     8092 Zurich, Switzerland  
+%     cremy@ethz.ch; rsiegwart@ethz.ch
+%
+% (2) Department of Mechanical Engineering, 
+%     Bucknell University
+%     701 Moore Avenue
+%     Lewisburg, PA-17837, USA
+%     buffintk@bucknell.edu
+%
+%************************************************************************
+
+++ General ++
+This framework contains methods for gait simulation, creation, analysis, 
+and visualization.  They are located in the folder 'Shared' and its 
+sub-folders. 
+Additionally, the it is provided with three examples of gait creation, a 
+passive dynamic biped, a prismatic monopod, and a bounding quadruped.  All 
+model specific files are located in the corresponding sub-folders in the 
+folder 'Models'.  Each model has a 'main' script in its root directory, 
+which guide step-by-step through the functionality of the framework and 
+explain the usage of the shared functions.  The examples get more complex 
+from the 'passive dynamic walker' over 'the prismatic hopper' to the 
+'bounding quadruped', and are best examined in this order.  
+
+++ List of shared functions ++
+The following list of all shared functions indicates in which main file 
+(see numbers below) the function is used and explained in detail:
+(1) Main - PassiveDynamicWalker
+(2) Main - PrismaticMonopod
+(3) Main - BoundingQuadruped
+(*) All graphic related functions are called in sub functions of the three
+    3D graphics classes: 'PassiveWalker3DCLASS', 'PrismaticMonopod3DCLASS', 
+    and 'BoundingQuadruped3DCLASS'.
+Shared:
+- HybridDynamics -> Basic Simulation (1,2,3)
+Shared\Analysis:
+- FloquetAnalysis -> For stability analysis (1,3)
+Shared\Graphics:
+- OutputCLASS ->  Abstract interface class for simulation output (1)
+- Graphic2DSimpleLinkCLASS -> Show a simplified graphical representation 
+                              of the simulation (1,2,3)
+- OutputDirColSolution -> Output the states of a solution obtained with
+                          direct collocation (2)
+- PlotStateCLASS -> Output the states as a plot while simulating (1)
+- RecordStateCLASS -> Store the states for later use while simulating 
+                      (1,2,3)
+Shared\Graphics\Misc:
+- AddPatchesWithColor -> Combines faces and vertices of two patches into 
+                         one single object (*)
+- BendVertices -> Bend the vertices of a cylindrical object (*)
+- Body312dc -> Creates a 3D rotation matrix (*)
+- Get2DGroundPatch -> Create a representation of a 2D ground plane (*)
+- Get3DGroundPatch -> Create a representation of a 3D ground plane (*)
+- TransformVertices -> Apply a linear transform and translation to a set 
+                       of vertices (*)
+Shared\Graphics\SeriesElasticActuation:
+- GetMonopod2DOFPatch -> Create a visual representation of a monopod 
+                         hopper (*)
+- GetQuadrupedPatch -> Create a visual representation of a bounding 
+                       quadruped (*)
+- All other functions are only called by the two Get...Patch functions 
+  above and create sub-components for the visualization.
+Shared\Synthesis: 
+- FindPeriodicSolution -> For gait creation (1,2,3)
+- FindPeriodicSolution_DIRCOL -> For advanced gait creation (2,3)
+Shared\Utilities:
+- ResampleDircolGrid -> To resample an existing solution obtained by
+                        direct collocation (2)
+- Struct2Vec -> Convert structs into vectors(which can be specifically 
+                ordered by name) (2,3)
+- Vec2Struct -> Convert a vector and a cell array of names into a struct(2)
+ 
+++ Model Structure ++
+The principle structure of each model-folder is identical:
+They all contain a single 'main' script, and a number of sub-folders with 
+additional model-related information:
+- Dynamics
+    This is the most important folder of each model.  
+    It contains the definition of the dynamics (i.e., the FlowMap, JumpMap, 
+    and JumpSet) and a function for the symbolic derivation of the dynamic 
+    equations.  The meaning of FlowMap, JumpMap, and JumpSet is explained 
+    in detail in the accompanying paper and not described further here.  
+    The 'SymbolicComputationOfEQM', produces auto-generated functions for 
+    the computation of kinematical elements (Jacobians, link position, 
+    etc.), as well as for dynamic elements (mass matrix, gravitational and 
+    coriolis forces).  All these functions are stored in the folder 
+    'AutoGeneratedFcts'
+    Since it's inconvenient to call these functions using the implicit 
+    MATLAB standard, wrapper functions combine some of these auto-generated
+    functions and provide them with a interface more suitable to the 
+    framework (i.e., using state-vectors 'y' and 'z', and parameters 'p', 
+    and 's').  The wrapper functions are all stored in the folder
+    'WrapperFcts'
+    The definition of the continuous state vector 'y', the discrete state 
+    vector 'z', and the system parameter vector 'p', as well as the (if 
+    applicable) states 'u' and parameters 's' of the excitation function 
+    are all stored in the folder 'Definitions'
+    The meaning of the individual vectors is given in the paper.  Here we 
+    would only like to note that each of these definition-functions returns 
+        (a) a vector of initial values.
+        (b) a cell array of state names.
+        (c) a struct that maps the names to the indices of the vector.
+    They are all used in different ways in the framework.
+    Two functions remain: 'ComputeDifferentiableForces', which is used to 
+    compute the forces in the joints (in the present example, these forces 
+    are created solely by springs, but could include, friction, motor 
+    models, and the like.  The 'ExcitationFunction', computes the inputs u
+    to the model as a function of the state 'y' and 'z', and the excitation 
+    parameters 's'.  The details are described in the paper.  The two  
+    functions can be found in the folder 'Misc'.
+- Data
+    Intermediate results are stored in this folder.  The files here are
+    exclusively created in the corresponding 'main' script and explained in 
+    detail there.  They can be used to skip certain parts of the 
+    optimization which can become quite time-consuming.
+- Graphics
+    Extensive visualization functionality for rendered graphics is provided 
+    with each example.  Each model provides a 3DCLASS that can be called in
+    the simulation framework.  The supporting functionality (creation of 
+    patch objects, etc.) is in this folder for the passive dynamic walker, 
+    and under shared/graphics/SeriesElasticActuation for the two actuated 
+    models.
+ 
+++ Interface to the simulation framework ++
+The simulation interface (i.e. the function HybridDynamics) of this 
+framework calls the three dynamic functions (FlowMap, JumpMap, and JumpSet) 
+and the the defintion functions (ContStateDefinition, ...) by NAME.  That 
+means, they must be present on the MATLAB search-path with these exact names 
+and should not be shadowed by other functions.  The remaining model-
+specific functionality is only called internally.  The only exception is 
+the excitation function, which is passed as function handle to the solvers.
+The remaining structure of the models, especially the use of Auto-generated
+functions, and the DEA-formulation of the dynamics is recommended, but can
+be changed as long as the interface described above is present.
+ 
+All scripts and functions are provided with extensive help and 
+documentation
