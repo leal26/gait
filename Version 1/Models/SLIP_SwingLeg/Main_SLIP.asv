@@ -96,7 +96,7 @@ addpath([GaitCreationDir,slash,'Models',slash,'SLIP_SwingLeg',slash,'Inputs;'])
 IP.phase = 0.;
 IP.duty = 1.;
 IP.frequency = 1;
-IP.amplitude = 324.6427+500;
+IP.amplitude = 324.6427+10;
 IP.mass = 10; % kg (used for normalizing)
 IP.gravity = 9.80665; % m/s2 (used for normalizing)
 [SMA_L, SMA_R] = define_SMA(IP, IP);
@@ -172,17 +172,18 @@ zPERIOD(discStateIndices.rcontPt) = 1;
 % will be aborted if the terminal state is never reached.  In this case, an
 % error message will be created:  
 solveOptions.tMAX = 10;
-% Call the root-search function.
-
+% Call the root-search function.[yCYC, zCYC, pCYC]
+load('\\coe-fs.engr.tamu.edu\Grads\leal26\Documents\GitHub\gait\periodic_solution.mat')       
                                                     
 %% (c) Display the solution:
 SMA_L_database = [];
 SMA_R_database = [];
-pCYC(systParamIndices.k) = 20; % Stance leg stiffness
+pCYC(systParamIndices.k) = NaN; % Stance leg stiffness
 
 figure(1)
 simOptions.tMAX = 5; 
 recOUTPUT = RecordStateCLASS();
+recOUTPUT.rate = 0.001;
 [yOUT, zOUT, tOUT, recOUTPUT] = HybridDynamics(yCYC, zCYC, pCYC, SMA_L, SMA_R, recOUTPUT, simOptions);
 simRES = recOUTPUT.retrieve();
 % Define which states are plotted:
@@ -190,7 +191,9 @@ plotStates = [ contStateIndices.x, contStateIndices.dx,contStateIndices.y, contS
 plot(simRES.t,simRES.continuousStates(plotStates,:))
 legend(simRES.continuousStateNames(plotStates));
 ContactForces(simRES.continuousStates(:,:),simRES.discreteStates(:,:),pCYC,simRES.t, SMA_L, SMA_R);
-
+sma_plotting(simRES.t)
+phase_space(simRES.t,simRES.continuousStates(plotStates,:))
+BREAK
 % Show animations
 SMA_L_database = [];
 SMA_R_database = [];

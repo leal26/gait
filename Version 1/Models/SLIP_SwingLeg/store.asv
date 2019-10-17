@@ -24,7 +24,7 @@ if isempty(SMA_L_database)
 
     try
         SMA_L_database.eps(i,1) = SMA_L.eps;
-        SMA_L_database.T(i,1) = SMA_L.T;
+
         SMA_L_database.sigma(i,1) = SMA_L.sigma;
         SMA_L_database.MVF(i,1) = SMA_L.MVF;
         SMA_L_database.eps_t(i,1) = SMA_L.eps_t;
@@ -47,9 +47,9 @@ if isempty(SMA_L_database)
     SMA_R_database.MVF(1) = SMA_R.MVF_init;
     SMA_R_database.eps_t(1) = SMA_R.eps_t_0;
     
+    SMA_R_database.T(i,1) = SMA_R.T;
     try
         SMA_R_database.eps(i,1) = SMA_R.eps;
-        SMA_R_database.T(i,1) = SMA_R.T;
         SMA_R_database.sigma(i,1) = SMA_R.sigma;
         SMA_R_database.MVF(i,1) = SMA_R.MVF;
         SMA_R_database.eps_t(i,1) = SMA_R.eps_t;
@@ -77,7 +77,6 @@ else
         SMA_R_database.sigma(i,1) = SMA_R.sigma;
         SMA_R_database.MVF(i,1) = SMA_R.MVF;
         SMA_R_database.eps_t(i,1) = SMA_R.eps_t;
-        SMA_R_database.E(i,1) = SMA_R.E;
     catch
         0==0;
     end
