@@ -9,48 +9,29 @@ y=zeros(length(y_initial),length(t));
 y(:,1)=y_initial;
 prev_teOUT = [-1 -1 -1 -1 -1 -1];
 done = false;
-if nargin(F_ty) == 2
 
-    for i=1:(length(t)-1)
-        % Update data for output
-        OutputFcn(t(i),y(:,i),[]);
-        % Calculate next value
-        y(:,i+1) = next_y(F_ty, y, t, h, i);
-        % Determine if an event happened
-        [teOUT,~,~] = Events(0,y(:,i+1));
-        inflections = sign(prev_teOUT).*sign(teOUT);
-        if i>1
-            for j=1:length(inflections)
-                if inflections(j) <= 0
-                    done = true;
-                    break
-                end
-            end
-        end
-        prev_teOUT = teOUT;
-        if done
-            y = y(:,1:i);
-            t = t(:,1:i);
-            break
-        end
-    end
-elseif nargin(F_ty) == 3
-    for i=1:(length(t)-1)
-        y(:,i+1) = next_y(F_ty, y, t, h, i);
-        [teOUT,~,~] = Events(0,y(:,i+1));
-        inflections = sign(prev_teOUT).*sign(teOUT);
+
+for i=1:(length(t)-1)
+    % Update data for output
+    OutputFcn(t(i),y(:,i),[]);
+    % Calculate next value
+    y(:,i+1) = next_y(F_ty, y, t, h, i, true);
+    % Determine if an event happened
+    [teOUT,~,~] = Events(0,y(:,i+1));
+    inflections = sign(prev_teOUT).*sign(teOUT);
+    if i>1
         for j=1:length(inflections)
             if inflections(j) <= 0
                 done = true;
                 break
             end
         end
-        prev_teOUT = teOUT;
-        if done
-            y = y(:,1:i);
-            t = t(:,1:i);
-            break
-        end
+    end
+    prev_teOUT = teOUT;
+    if done
+        y = y(:,1:i);
+        t = t(:,1:i);
+        break
     end
 end
 
@@ -75,8 +56,15 @@ end
 % err = immse(y,y_c2)
 end
 
-function [y_i1] = next_y(F_ty, y, t, h, i)
-    k1 = F_ty(t(i),y(:,i));
+function [y_i1] = next_y(F_ty, y, t, h, i, store)
+global store_flag
+    if isempty(store)
+        k1 = F_ty(t(i),y(:,i));
+    else
+        store_flag = true;
+        k1 = F_ty(t(i),y(:,i));
+        store_flag = false;
+    end
     k2 = F_ty(t(i)+0.5*h,y(:,i)+0.5*h*k1);
     k3 = F_ty((t(i)+0.5*h),(y(:,i)+0.5*h*k2));
     k4 = F_ty((t(i)+h),(y(:,i)+k3*h));
