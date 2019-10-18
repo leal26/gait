@@ -35,7 +35,6 @@ for i=1:(length(t)-1)
     end
 end
 
-
 yeOUT = y(:,end);
 teOUT = t(end);
 % if not last step

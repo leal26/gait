@@ -88,6 +88,7 @@ SMA_L_database = [];
 SMA_R_database = [];
 graphOUTPUT = SLIP_Model_Graphics_AdvancedPointFeet(pCYC); % Must be called again with new parameters p, such that the new angle of attack is visualized
 [yOUT, zOUT, tOUT] = HybridDynamics(yCYC, zCYC, pCYC, SMA_L, SMA_R, graphOUTPUT, simOptions);
+
 recOUTPUT = RecordStateCLASS();
 % [yOUT, zOUT, tOUT, recOUTPUT] = HybridDynamics(yCYC, zCYC, pCYC, SMA_L, SMA_R,recOUTPUT, simOptions);
 % simRES = recOUTPUT.retrieve();

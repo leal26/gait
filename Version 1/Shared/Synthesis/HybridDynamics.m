@@ -203,6 +203,10 @@ function [yOUT, zOUT, tOUT, varargout] = HybridDynamics(yIN, zIN, p, SMA_L, SMA_
             
     end
     
+    if isa(outputIN, 'SLIP_Model_Graphics_AdvancedPointFeet')
+        disp('HERE')
+        close(outputIN.video);
+    end
     % Map states for return values
     yOUT = yIN;
     zOUT = zIN;

@@ -47,6 +47,7 @@ classdef SLIP_Model_Graphics_AdvancedPointFeet < OutputCLASS
         SpringLine_l;
         SpringLine_r;
 
+        video;
     end
     % Public methods:
     methods
@@ -126,7 +127,9 @@ classdef SLIP_Model_Graphics_AdvancedPointFeet < OutputCLASS
             obj.COGPatch = patch(vert_x, vert_y, cat(3,[1 0 1 0], [1 0 1 0],[1 0 1 0]),'LineWidth',3); 
             % Set up view:
 
-            
+            obj.video = VideoWriter('test','MPEG-4');
+            obj.video.Quality = 100;
+            open(obj.video);
         end
         
         
@@ -186,6 +189,7 @@ classdef SLIP_Model_Graphics_AdvancedPointFeet < OutputCLASS
         axis([x_-1,x_+1,-0.2,1.8])
         box on;
         drawnow();
+        writeVideo(obj.video,getframe(gcf));
         end
         
         
