@@ -44,6 +44,7 @@ function dydt = FlowMap(t, y, z, p, SMA_L, SMA_R, varargin)
     global counter
     global SMA_L_database
     global SMA_R_database
+    global store_flag
 	% Get a mapping for the state and parameter vectors.  This allows us
     % to use a more readable syntax: "y(contStateIndices.dy)" instead of
     % "y(3)" while still operating with vectors and not with structs.
@@ -83,17 +84,17 @@ function dydt = FlowMap(t, y, z, p, SMA_L, SMA_R, varargin)
             if isnan(k)
                 eps = (l_legL-LegL)/l_legL;
                 counter = counter + 1;
-                SMA_L.eps = eps*20/1.138989e+04;
+                SMA_L.eps = eps*l_legL*20/1.138989e+04*3.7427/8.8888;
                 SMA_L.T = SMA_L.T_function(t);
                 [SMA_L] = OneD_SMA_Model(counter, SMA_L);
                 F_sma = SMA_L.area*SMA_L.sigma/SMA_L.norm;% F_sma = k*SMA_R.eps/10;  
                 fprintf('Right: %d, %d, %d\n', t, SMA_L.eps, SMA_L.area*SMA_L.sigma/SMA_L.norm/u)
                 Fl=F_sma;
-             
             else
                 Fl=k*(l_legL-LegL);
             end
             phi_L = atan2(z(discStateIndices.lcontPt)-y(contStateIndices.x), y(contStateIndices.y)-0) - alpha; % in body frame
+
     end
             
     switch z(discStateIndices.rphase)
@@ -101,24 +102,29 @@ function dydt = FlowMap(t, y, z, p, SMA_L, SMA_R, varargin)
             LegR = r_legL;
             Fr=0;
             phi_R = phiR; % convert to inertia frame
+            SMA_R = 0;
         case 2 %(stance = 2)
             LegR = sqrt((y(contStateIndices.x)-z(discStateIndices.rcontPt))^2 + (y(contStateIndices.y)-0)^2);
             if isnan(k)
-                eps = (r_legL-LegR)/r_legL;
+                u = r_legL-LegR;
+                shear_strain = 3*SMA_R.r/(8*3.1415*SMA_R.N*SMA_R.R^2)
                 counter = counter + 1;
-                SMA_R.eps = eps*r_legL*20/1.138989e+04;
+                SMA_R.eps = eps*r_legL*20/1.138989e+04*8.8888/3.7427;
                 SMA_R.T = SMA_R.T_function(t);
                 [SMA_R] = OneD_SMA_Model(counter, SMA_R);
                 F_sma = SMA_R.area*SMA_R.sigma/SMA_R.norm;% F_sma = k*SMA_R.eps/10;  
                 fprintf('Right: %d, %d, %d, %d\n', t, SMA_R.eps, 20*(r_legL-LegR), F_sma)
                 Fr=F_sma;
-                store(0, SMA_R)
             else
                 Fr=k*(r_legL-LegR);
             end
             phi_R = atan2(z(discStateIndices.rcontPt)-y(contStateIndices.x), y(contStateIndices.y)-0) - alpha; % in body frame
     end                         
-             
+    
+    if store_flag
+        store(SMA_L, SMA_R)
+%         scatter(t,Fr,'k')
+    end
     Fx=-Fl*sin(phi_L+alpha)-Fr*sin(phi_R+alpha);
     Fy= Fl*cos(phi_L+alpha)+Fr*cos(phi_R+alpha);
     

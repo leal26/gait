@@ -6,8 +6,10 @@ function [SMA_L, SMA_R] = define_SMA(IP_L, IP_R)
 % If list with two components:
 % Temperature and strain at the start and at the ends of heating
 % Linear increments strain and temperature loading step assumed
-
-SMA.area = .25*(3.1415*0.004^2);
+SMA.r = 0.0002; % From Enemark
+SMA.R = 0.0056;
+SMA.N = 36;
+SMA.area = 3.1415*SMA.r^2;
 
 % MATERIAL PARAMETERS (Structure: P)
 % Young's Modulus for Austenite and Martensite 

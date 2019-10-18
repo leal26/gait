@@ -6,8 +6,10 @@ function [SMA_L, SMA_R] = define_SMA(IP_L, IP_R)
 % If list with two components:
 % Temperature and strain at the start and at the ends of heating
 % Linear increments strain and temperature loading step assumed
-
-SMA.area = .25*(3.1415*0.004^2);
+SMA.r = 0.0002; % From Enemark
+SMA.R = 0.0056;
+SMA.N = 1000;
+SMA.area = 3.1415*SMA.r^2;
 
 % MATERIAL PARAMETERS (Structure: P)
 % Young's Modulus for Austenite and Martensite 
@@ -15,18 +17,18 @@ SMA.E_A = 3.7427e+10;
 SMA.E_M = 8.8888e+10;
 % Transformation temperatures (M:Martensite, A:
 % Austenite), (s:start,f:final)
-SMA.M_s = 363.5013;
-SMA.M_f = 297.9735;
-SMA.A_s = 324.6427;
+SMA.M_s = 360.9735;
+SMA.M_f = 355.6427;
+SMA.A_s = 375.5013;
 SMA.A_f = 385.0014;
 
 % Slopes of transformation boundarings into austenite (C_A) and
 % martensite (C_M) at Calibration Stress 
-SMA.C_A = 7.1986e+06;
-SMA.C_M = 7.9498e+06;
+SMA.C_A = 7.1986e+04;
+SMA.C_M = 7.9498e+04;
 
 % Maximum and minimum transformation strain
-SMA.H_min = 0.0387;
+SMA.H_min = 0.0;
 SMA.H_sat = 0.0550;
 
 SMA.k = 4.6849e-09;
@@ -57,6 +59,7 @@ SMA.MVF_init = 0;
 SMA.eps_t_0 = 0;
 SMA.sigma_0 = 0;
 SMA.eps_0 = 0;
+SMA.E_0 = inv(inv(SMA.E_A)+SMA.MVF_init*(inv(SMA.E_M)-inv(SMA.E_A)));
 SMA.n = false;
 SMA.to_plot = false;
 
