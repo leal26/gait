@@ -68,21 +68,15 @@ plot(SMA_R_database.eps(1:length(T)), ...
      SMA_R_database.sigma(1:length(T))/1e6, ...
      'LineWidth',2,'color',color_r, ...
      'DisplayName', 'Right leg')
-
-margin = 0.1;
-x_max = max([max(SMA_R_database.eps(1:length(T))), max(SMA_L_database.eps(1:length(T)))]);
-x_min = min([min(SMA_R_database.eps(1:length(T))), min(SMA_L_database.eps(1:length(T)))]);
-y_max = max([max(SMA_R_database.sigma(1:length(T))), max(SMA_L_database.sigma(1:length(T)))])/1e6;
-y_min = min([min(SMA_R_database.sigma(1:length(T))), min(SMA_L_database.sigma(1:length(T)))])/1e6;
-hx =  x_max - x_min;
-hy = y_max - y_min;
-xlim([x_min, x_max + margin*hx]);
-ylim([y_min, y_max + margin*hy]);
+ 
+hx = max(Y(ii,:)) - min(Y(ii,:));
+xlim([min(Y(ii,:)) - margin*hx, max(Y(ii,:)) + margin*hx]);
+hy = max(Y(jj,:)) - min(Y(jj,:));
+ylim([min(Y(jj,:)) - margin*hy, max(Y(jj,:)) + margin*hy]);
 xlabel('$\epsilon$','Interpreter','LaTex', ...
        'FontName','Times New Roman','fontsize', 14)
-ylabel('$\sigma$ (MPa)','Interpreter','LaTex', ...
+ylabel('Transformation strain','Interpreter','LaTex', ...
        'FontName','Times New Roman','fontsize', 14)
-legend('Location','best')
 
 %% Phase Diagram
 figure

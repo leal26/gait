@@ -48,7 +48,7 @@ if k == 2
     eps_t(1,1) = eps_t_0; %P.H_sat; %0;
     sigma(1,1) = sigma_0;
     MVF(1,1) = MVF_init; %0;
-    E(1,1)=P.E_M;
+    E(1,1)=P.E_A;
 else
     old_n = length(data.H_cur);
 %     disp(old_n);

@@ -15,7 +15,6 @@ MVF_init = P.MVF_init;
 eps_t_0 = P.eps_t_0;
 sigma_0 = P.sigma_0;
 eps_0 = P.eps;
-E_0 = P.E_0;
 n = P.n;
 to_plot = P.to_plot;
 
@@ -39,9 +38,14 @@ elastic_check = 'N';
 
 % Integration Scheme
 integration_scheme = 'I';
-
-[sigma,MVF,eps_t,E,MVF_r,eps_t_r, H_cur ] = Full_Model( k, T, eps, P, elastic_check, integration_scheme, MVF_init, eps_t_0, sigma_0, E_0, n );
-
+disp(T)
+disp(eps)
+disp(eps)
+fprintf('%f %f 'MVF_init, eps_t_0, sigma_0)
+disp(P)
+[sigma,MVF,eps_t,E,MVF_r,eps_t_r, H_cur ] = Full_Model( k, T, eps, P, elastic_check, integration_scheme, MVF_init, eps_t_0, sigma_0, n );
+disp(E)
+BREAK
 % P.eps = eps;
 % P.T =T;
 P.sigma = sigma(end);

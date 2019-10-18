@@ -15,8 +15,8 @@ SMA.E_A = 3.7427e+10;
 SMA.E_M = 8.8888e+10;
 % Transformation temperatures (M:Martensite, A:
 % Austenite), (s:start,f:final)
-SMA.M_s = 360.9735;
-SMA.M_f = 355.6427;
+SMA.M_s = 340.6427;
+SMA.M_f = 245.9735;
 SMA.A_s = 375.5013;
 SMA.A_f = 385.0014;
 
@@ -57,7 +57,6 @@ SMA.MVF_init = 0;
 SMA.eps_t_0 = 0;
 SMA.sigma_0 = 0;
 SMA.eps_0 = 0;
-SMA.E_0 = inv(inv(SMA.E_A)+SMA.MVF_init*(inv(SMA.E_M)-inv(SMA.E_A)));
 SMA.n = false;
 SMA.to_plot = false;
 

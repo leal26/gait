@@ -84,7 +84,7 @@ function dydt = FlowMap(t, y, z, p, SMA_L, SMA_R, varargin)
             if isnan(k)
                 eps = (l_legL-LegL)/l_legL;
                 counter = counter + 1;
-                SMA_L.eps = eps*20/1.138989e+04;
+                SMA_L.eps = eps*l_legL*20/1.138989e+04*3.7427/8.8888
                 SMA_L.T = SMA_L.T_function(t);
                 [SMA_L] = OneD_SMA_Model(counter, SMA_L);
                 F_sma = SMA_L.area*SMA_L.sigma/SMA_L.norm;% F_sma = k*SMA_R.eps/10;  
@@ -108,7 +108,7 @@ function dydt = FlowMap(t, y, z, p, SMA_L, SMA_R, varargin)
             if isnan(k)
                 eps = (r_legL-LegR)/r_legL;
                 counter = counter + 1;
-                SMA_R.eps = eps*r_legL*20/1.138989e+04;
+                SMA_R.eps = eps*r_legL*20/1.138989e+04*8.8888/3.7427;
                 SMA_R.T = SMA_R.T_function(t);
                 [SMA_R] = OneD_SMA_Model(counter, SMA_R);
                 F_sma = SMA_R.area*SMA_R.sigma/SMA_R.norm;% F_sma = k*SMA_R.eps/10;  
@@ -122,6 +122,7 @@ function dydt = FlowMap(t, y, z, p, SMA_L, SMA_R, varargin)
     
     if store_flag
         store(SMA_L, SMA_R)
+%         scatter(t,Fr,'k')
     end
     Fx=-Fl*sin(phi_L+alpha)-Fr*sin(phi_R+alpha);
     Fy= Fl*cos(phi_L+alpha)+Fr*cos(phi_R+alpha);
