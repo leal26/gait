@@ -41,7 +41,7 @@ teOUT = t(end);
 if i~= length(t)-1
     ieOUT = j;
 end
-    
+
 %Checking custom routine and MATLAB function ode45
 % [t_c,y_c] = ode45(F_ty,t,y_initial);
 % %Plot in one figure

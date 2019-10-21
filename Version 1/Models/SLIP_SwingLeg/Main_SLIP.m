@@ -58,7 +58,7 @@ addpath([GaitCreationDir,slash,'Models',slash,'SLIP_SwingLeg',slash,'Inputs;'])
 IP.phase = 0.;
 IP.duty = 1.;
 IP.frequency = 1;
-IP.amplitude = 385.0014 + 10000;
+IP.amplitude = 385.0014 + 0;
 IP.mass = 10; % kg (used for normalizing)
 IP.gravity = 9.80665; % m/s2 (used for normalizing)
 [SMA_L, SMA_R] = define_SMA(IP, IP);                                                  

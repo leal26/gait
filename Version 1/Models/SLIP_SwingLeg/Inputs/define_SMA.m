@@ -6,27 +6,35 @@ function [SMA_L, SMA_R] = define_SMA(IP_L, IP_R)
 % If list with two components:
 % Temperature and strain at the start and at the ends of heating
 % Linear increments strain and temperature loading step assumed
-SMA.r = 0.00114567; % From Enemark
-SMA.R = 0.0056;
-SMA.N = 18.0001*(2*(1+0.3));
-SMA.area = 3.1415*SMA.r^2;
-SMA.l0 = 1;
 
 % MATERIAL PARAMETERS (Structure: P)
 % Young's Modulus for Austenite and Martensite 
-SMA.E_A = 3.7427e+10;
-SMA.E_M = 8.8888e+10;
+SMA.E_A = 3.7427e+10/(2*(1+0.3));
+SMA.E_M = 8.8888e+10/(2*(1+0.3));
+
+% normalizing factor
+SMA.l0 = 1;
+SMA.norm = IP_L.mass*IP_L.gravity/SMA.l0;
+
+% SMA stuff
+k = 20*SMA.norm;
+SMA.r = 0.001778; % From Enemark
+SMA.R = SMA.r/0.3263;
+SMA.N = SMA.r^4*SMA.E_A/(4*SMA.R^3*k);
+SMA.area = 3.1415*SMA.r^2;
+
+
 % Transformation temperatures (M:Martensite, A:
 % Austenite), (s:start,f:final)
-SMA.M_s = 360.9735;
-SMA.M_f = 355.6427;
-SMA.A_s = 375.5013;
-SMA.A_f = 385.0014;
+SMA.M_s = 380;
+SMA.M_f = 376;
+SMA.A_s = 381;
+SMA.A_f = 385;
 
 % Slopes of transformation boundarings into austenite (C_A) and
 % martensite (C_M) at Calibration Stress 
-SMA.C_A = 7.1986e+04;
-SMA.C_M = 7.9498e+04;
+SMA.C_A = 7.1986e+06;
+SMA.C_M = 7.9498e+06;
 
 % Maximum and minimum transformation strain
 SMA.H_min = 0.0;
@@ -72,9 +80,6 @@ SMA_R = SMA;
 SMA_L.T_function = @(t) pulse_wave(t, IP_L);
 SMA_R.T_function = @(t) pulse_wave(t, IP_R);
 
-% normalizing factor
-SMA_L.norm = IP_L.mass*IP_L.gravity/SMA_L.l0;
-SMA_R.norm = IP_R.mass*IP_R.gravity/SMA_R.l0;
 % T_inp = [T_0; T_final];
 % for i = 1:(size(T_inp,1)-1)
     % if i == 1
