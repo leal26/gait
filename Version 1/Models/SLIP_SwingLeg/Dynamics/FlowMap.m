@@ -107,12 +107,11 @@ function dydt = FlowMap(t, y, z, p, SMA_L, SMA_R, varargin)
             LegR = sqrt((y(contStateIndices.x)-z(discStateIndices.rcontPt))^2 + (y(contStateIndices.y)-0)^2);
             if isnan(k)
                 u = r_legL-LegR;
-                eps = u*3*SMA_R.r/(8*3.1415*SMA_R.N*SMA_R.R^2);
                 counter = counter + 1;
-                SMA_R.eps = eps; %*r_legL*20/1.138989e+04*8.8888/3.7427;
+                SMA_R.eps = u*3*SMA_R.r/(8*3.1415*SMA_R.N*SMA_R.R^2);
                 SMA_R.T = SMA_R.T_function(t);
                 [SMA_R] = OneD_SMA_Model(counter, SMA_R);
-                F_sma = SMA_R.sigma*3*SMA_R.r/(8*3.1415*SMA_R.N*SMA_R.R^2)/SMA_R.norm; 
+                F_sma = SMA_R.sigma*2*3.1415*SMA_R.r^3/(3*SMA_R.R)/SMA_R.norm; 
                 fprintf('Right: %d, %d, %d, %d\n', t, SMA_R.eps, 20*(r_legL-LegR), F_sma)
                 Fr=F_sma;
             else

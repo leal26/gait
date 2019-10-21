@@ -41,11 +41,11 @@ switch z(1,i)
                             l_legr = sqrt((y(1,i)-z(4,i))^2 + (y(3,i)-0)^2);
                             gamma_legr = atan2(z(4,i)-y(1,i), y(3,i)-0);
                             if isnan(p(4))
-                                eps = (p(2)-l_legr)/p(2);
+                                % eps = (p(2)-l_legr)/p(2);
                                 % SMA_R.eps = eps*l_legr*20/1.138989e+04;
                                 T = SMA_R_database.T(i);
                                 sigma = SMA_R_database.sigma(i);
-                                F_sma = SMA_R.area*sigma/SMA_R.norm;
+                                F_sma = sigma*2*3.1415*SMA_R.r^3/(3*SMA_R.R)/SMA_R.norm; 
                                 f_springr=F_sma;
                             else
                                 f_springr=(p(2) - l_legr) * p(4);
