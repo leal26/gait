@@ -55,12 +55,15 @@ addpath([GaitCreationDir,slash,'Models',slash,'SLIP_SwingLeg',slash,'SMA_tempera
 addpath([GaitCreationDir,slash,'Models',slash,'SLIP_SwingLeg',slash,'phase_diagram;'])
 addpath([GaitCreationDir,slash,'Models',slash,'SLIP_SwingLeg',slash,'Inputs;'])
 
-IP.phase = 0.;
-IP.duty = 1.;
-IP.frequency = 1;
-IP.amplitude = 385.0014 + 0;
+
+% IP.duty = 1.;           
+IP.frequency = 2.8571  ;
+IP.mean = 375.0000   ;
+IP.amplitude = 14.2857    ;
+IP.phase = 0.3857;
 IP.mass = 10; % kg (used for normalizing)
 IP.gravity = 9.80665; % m/s2 (used for normalizing)
+SMA_density = 6450; %kg/m3
 [SMA_L, SMA_R] = define_SMA(IP, IP);                                                  
 %% (c) Display the solution:
 SMA_L_database = [];
@@ -82,6 +85,9 @@ legend(simRES.continuousStateNames(plotStates));
 ContactForces(simRES.continuousStates(:,:),simRES.discreteStates(:,:),pCYC,simRES.t, SMA_L, SMA_R);
 sma_plotting(simRES.t, SMA_L)
 phase_space(simRES.continuousStates(plotStates,:))
+disp(calculate_specific_power(SMA_R_database.sigma(1:length(simRES.t)), ...
+                             SMA_R_database.eps(1:length(simRES.t)), ...
+                             SMA_density, recOUTPUT.rate, sqrt(1/IP.gravity)))
 
 % Show animations
 SMA_L_database = [];

@@ -111,8 +111,12 @@ function dydt = FlowMap(t, y, z, p, SMA_L, SMA_R, varargin)
                 SMA_R.eps = u*3*SMA_R.r/(8*3.1415*SMA_R.N*SMA_R.R^2);
                 SMA_R.T = SMA_R.T_function(t);
                 [SMA_R] = OneD_SMA_Model(counter, SMA_R);
-                F_sma = SMA_R.sigma*2*3.1415*SMA_R.r^3/(3*SMA_R.R)/SMA_R.norm; 
-                fprintf('Right: %d, %d, %d, %d\n', t, SMA_R.eps, 20*(r_legL-LegR), F_sma)
+                F_sma = SMA_R.sigma*2*3.1415*SMA_R.r^3/(3*SMA_R.R)/SMA_R.norm;
+%                 try
+%                     fprintf('Right: %d, %d, %d, %d, %d\n', t, SMA_R.eps, 20*(r_legL-LegR), F_sma, SMA_R_database.index)
+%                 catch
+%                     fprintf('Right: %d, %d, %d, %d, 1\n', t, SMA_R.eps, 20*(r_legL-LegR), F_sma)
+%                 end
                 Fr=F_sma;
             else
                 Fr=k*(r_legL-LegR);

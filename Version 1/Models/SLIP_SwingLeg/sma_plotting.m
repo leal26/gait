@@ -11,7 +11,7 @@ subplot(3,2,1)
 hold on
 plot(T,SMA_L_database.eps(1:length(T)),'LineWidth',2,'color',color_l)
 plot(T,SMA_R_database.eps(1:length(T)),'LineWidth',2,'color',color_r)
-legend('Left leg','Right leg')
+% legend('Left leg','Right leg')
 xlabel('Stride Time $[\sqrt{l_o/g}]$','Interpreter','LaTex')
 ylabel('Strain','Interpreter','LaTex')
 
@@ -19,7 +19,7 @@ subplot(3,2,2)
 hold on
 plot(T,SMA_L_database.T(1:length(T)),'LineWidth',2,'color',color_l)
 plot(T,SMA_R_database.T(1:length(T)),'LineWidth',2,'color',color_r)
-legend('Left leg','Right leg')
+% legend('Left leg','Right leg')
 xlabel('Stride Time $[\sqrt{l_o/g}]$','Interpreter','LaTex')
 ylabel('Temperature (K)','Interpreter','LaTex')
 
@@ -27,7 +27,7 @@ subplot(3,2,3)
 hold on
 plot(T,SMA_L_database.sigma(1:length(T)),'LineWidth',2,'color',color_l)
 plot(T,SMA_R_database.sigma(1:length(T)),'LineWidth',2,'color',color_r)
-legend('Left leg','Right leg')
+% legend('Left leg','Right leg')
 xlabel('Stride Time $[\sqrt{l_o/g}]$','Interpreter','LaTex')
 ylabel('Stress (Pa)','Interpreter','LaTex')
 
@@ -35,7 +35,7 @@ subplot(3,2,4)
 hold on
 plot(T,SMA_L_database.MVF(1:length(T)),'LineWidth',2,'color',color_l)
 plot(T,SMA_R_database.MVF(1:length(T)),'LineWidth',2,'color',color_r)
-legend('Left leg','Right leg')
+% legend('Left leg','Right leg')
 xlabel('Stride Time $[\sqrt{l_o/g}]$','Interpreter','LaTex')
 ylabel('$\xi$','Interpreter','LaTex')
 
@@ -43,7 +43,7 @@ subplot(3,2,5)
 hold on
 plot(T,SMA_L_database.eps_t(1:length(T)),'LineWidth',2,'color',color_l)
 plot(T,SMA_R_database.eps_t(1:length(T)),'LineWidth',2,'color',color_r)
-legend('Left leg','Right leg')
+% legend('Left leg','Right leg')
 xlabel('Stride Time $[\sqrt{l_o/g}]$','Interpreter','LaTex')
 ylabel('Transformation strain','Interpreter','LaTex')
 
@@ -51,7 +51,7 @@ subplot(3,2,6)
 hold on
 plot(T,SMA_L_database.E(1:length(T)),'LineWidth',2,'color',color_l)
 plot(T,SMA_R_database.E(1:length(T)),'LineWidth',2,'color',color_r)
-legend('Left leg','Right leg')
+% legend('Left leg','Right leg')
 xlabel('Stride Time $[\sqrt{l_o/g}]$','Interpreter','LaTex')
 ylabel('Young Modulus (Pa)','Interpreter','LaTex')
 

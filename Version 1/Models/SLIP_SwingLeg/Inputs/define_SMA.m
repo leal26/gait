@@ -77,8 +77,8 @@ SMA_L = SMA;
 SMA_R = SMA;
 
 % Define temperature cycles
-SMA_L.T_function = @(t) pulse_wave(t, IP_L);
-SMA_R.T_function = @(t) pulse_wave(t, IP_R);
+SMA_L.T_function = @(t) cosine_wave(t, IP_L);
+SMA_R.T_function = @(t) cosine_wave(t, IP_R);
 
 % T_inp = [T_0; T_final];
 % for i = 1:(size(T_inp,1)-1)
