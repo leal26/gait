@@ -51,6 +51,7 @@ function [yPLUS, zPLUS, isTerminal] = JumpMap(yMINUS, zMINUS, p, event)
     % "y(3)" while still operating with vectors and not with structs.
     % We keep the index-structs in memory to speed up processing
     persistent contStateIndices  systParamIndices discStateIndices
+    global active_leg
     if isempty(contStateIndices)  || isempty(systParamIndices) || isempty(discStateIndices)
         [~, ~, contStateIndices] = ContStateDefinition();
         [~, ~, systParamIndices] = SystParamDefinition();
@@ -91,20 +92,25 @@ function [yPLUS, zPLUS, isTerminal] = JumpMap(yMINUS, zMINUS, p, event)
             % Only simulate half of the stride. Switch left and right legs 
             % states to make them periodic. (The order of the following code 
             % matters!)
-            yPLUS(contStateIndices.phiL)  =  yMINUS(contStateIndices.phiR);
-            yPLUS(contStateIndices.dphiL) =  yMINUS(contStateIndices.dphiR);
-            yPLUS(contStateIndices.phiR)  =  yPLUS_phiL;
-            yPLUS(contStateIndices.dphiR) =  yPLUS_dphiL; % comment these lines for asymmerical skipping solutions  
-            
-            zPLUS(discStateIndices.lcontPt) = zPLUS(discStateIndices.rcontPt) - yMINUS(contStateIndices.x);
-            zPLUS(discStateIndices.rcontPt) = z_lcontPt - yMINUS(contStateIndices.x);
-            zPLUS(discStateIndices.lphase)  = zPLUS(discStateIndices.rphase);
-            zPLUS(discStateIndices.rphase)  = zPLUS_phiL;
-            % Reset x to zero, so x is periodic as well.
-            yPLUS(contStateIndices.x) = 0; 
+%             yPLUS(contStateIndices.phiL)  =  yMINUS(contStateIndices.phiR);
+%             yPLUS(contStateIndices.dphiL) =  yMINUS(contStateIndices.dphiR);
+%             yPLUS(contStateIndices.phiR)  =  yPLUS_phiL;
+%             yPLUS(contStateIndices.dphiR) =  yPLUS_dphiL; % comment these lines for asymmerical skipping solutions  
+%             
+%             zPLUS(discStateIndices.lcontPt) = zPLUS(discStateIndices.rcontPt) - yMINUS(contStateIndices.x);
+%             zPLUS(discStateIndices.rcontPt) = z_lcontPt - yMINUS(contStateIndices.x);
+%             zPLUS(discStateIndices.lphase)  = zPLUS(discStateIndices.rphase);
+%             zPLUS(discStateIndices.rphase)  = zPLUS_phiL;
+%             % Reset x to zero, so x is periodic as well.
+%             yPLUS(contStateIndices.x) = 0; 
+            zPLUS(discStateIndices.lcontPt) = yMINUS(contStateIndices.x) + l_legL * sin(phiL + alpha);
+            zPLUS(discStateIndices.lphase)  = 2;
+            yPLUS(contStateIndices.phiL)    = atan2(zPLUS(discStateIndices.lcontPt)-yPLUS(contStateIndices.x), yPLUS(contStateIndices.y)-0) - alpha;
+            yPLUS(contStateIndices.dphiL)   = -yMINUS(contStateIndices.dx)*cos(yPLUS(contStateIndices.phiL) + alpha) - yMINUS(contStateIndices.dy)*sin(yPLUS(contStateIndices.phiL) + alpha);
+            % Intermediate event. Simulation continues    
             %%%%%%%%%%%%%% For symmertical gaits
-            isTerminal = true;  
-        
+            isTerminal = false;  
+                
 
         case 2 % Event 2: Detect liftoff left
             zPLUS(discStateIndices.lphase)  = 1;
@@ -114,9 +120,16 @@ function [yPLUS, zPLUS, isTerminal] = JumpMap(yMINUS, zMINUS, p, event)
             % Intermediate event. Simulation continues
             isTerminal = false; 
             
+            
         case 3 % Event 3: detect Apex 1 (apex transit: dy==0 during flight)
             % Intermediate event. Simulation continues
-            isTerminal = false;    
+            isTerminal = false; 
+            if strcmp(active_leg, 'left')
+                active_leg = 'right';
+            elseif strcmp(active_leg, 'right')
+                active_leg = 'left';
+            end
+            
 
         case 4 % Event 4: Detect touchdown right
             zPLUS(discStateIndices.rcontPt) = yMINUS(contStateIndices.x) + r_legL * sin(phiR + alpha);
@@ -132,11 +145,17 @@ function [yPLUS, zPLUS, isTerminal] = JumpMap(yMINUS, zMINUS, p, event)
             yPLUS(contStateIndices.phiR)    = atan2(zPLUS(discStateIndices.rcontPt)-yPLUS(contStateIndices.x), yPLUS(contStateIndices.y)-0) - alpha; 
             yPLUS(contStateIndices.dphiR)   = -yMINUS(contStateIndices.dx)*cos(yPLUS(contStateIndices.phiR) + alpha) - yMINUS(contStateIndices.dy)*sin(yPLUS(contStateIndices.phiR) + alpha);
             % Intermediate event. Simulation continues
-            isTerminal = false; 
+            isTerminal = false;
+            
             
         case 6 % Event 6: detect Apex 2 (apex transit: dy==0 during flight)
             % Intermediate event. Simulation continues
             isTerminal = false;  
+%             if strcmp(active_leg, 'left')
+%                 active_leg = 'right';
+%             elseif strcmp(active_leg, 'right')
+%                 active_leg = 'left';
+%             end
     end
     
     % ************************************

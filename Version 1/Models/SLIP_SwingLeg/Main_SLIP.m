@@ -4,9 +4,9 @@ clc
 
 global SMA_L_database
 global SMA_R_database
-
+global active_leg
 load('\\coe-fs.engr.tamu.edu\Grads\leal26\Documents\GitHub\gait\periodic_solution.mat')  
-
+active_leg = 'right';
 %% (a) Setting up working environment
 % Define a base directory to make this file easily portable to other computers:
 
@@ -68,10 +68,10 @@ SMA_density = 6450; %kg/m3
 %% (c) Display the solution:
 SMA_L_database = [];
 SMA_R_database = [];
-pCYC(systParamIndices.k) = NaN; % Stance leg stiffness
+pCYC(systParamIndices.k) = 20; % Stance leg stiffness
 
 figure(1)
-simOptions.tMAX = 5; 
+simOptions.tMAX = 6; 
 recOUTPUT = RecordStateCLASS();
 recOUTPUT.rate = 0.001;
 % figure
@@ -83,11 +83,11 @@ plotStates = [ contStateIndices.x, contStateIndices.dx,contStateIndices.y, contS
 plot(simRES.t,simRES.continuousStates(plotStates,:))
 legend(simRES.continuousStateNames(plotStates));
 ContactForces(simRES.continuousStates(:,:),simRES.discreteStates(:,:),pCYC,simRES.t, SMA_L, SMA_R);
-sma_plotting(simRES.t, SMA_L)
-phase_space(simRES.continuousStates(plotStates,:))
-disp(calculate_specific_power(SMA_R_database.sigma(1:length(simRES.t)), ...
-                             SMA_R_database.eps(1:length(simRES.t)), ...
-                             SMA_density, recOUTPUT.rate, sqrt(1/IP.gravity)))
+% sma_plotting(simRES.t, SMA_L)
+% phase_space(simRES.continuousStates(plotStates,:))
+% disp(calculate_specific_power(SMA_R_database.sigma(1:length(simRES.t)), ...
+%                              SMA_R_database.eps(1:length(simRES.t)), ...
+%                              SMA_density, recOUTPUT.rate, sqrt(1/IP.gravity)))
 
 % Show animations
 SMA_L_database = [];

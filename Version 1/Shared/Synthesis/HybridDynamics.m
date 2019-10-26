@@ -82,6 +82,7 @@ function [yOUT, zOUT, tOUT, varargout] = HybridDynamics(yIN, zIN, p, SMA_L, SMA_
     global SMA_L_database
     global SMA_R_database
     global counter
+    global active_leg
     counter = 1;
     % *********************************************************************
     % INPUT HANDLING
@@ -167,8 +168,10 @@ function [yOUT, zOUT, tOUT, varargout] = HybridDynamics(yIN, zIN, p, SMA_L, SMA_
         % the results are stored in rows.
         % [t,y,teOUT,yeOUT,ieOUT] = ode_history_dependent(@(t,y) ODE(t,y,SMA_L,SMA_R),tspan,yIN,odeOPTIONS);
         % tspan = [0 5];
-
+        disp(active_leg)
         [t,y,teOUT,yeOUT,ieOUT] = ode_history_dependent(@(t,y) ODE(t,y,SMA_L,SMA_R),outputIN.rate, tspan, yIN, @Events, @OutputFcn);
+        disp(teOUT)
+        disp(ieOUT)
         if abs(t(end)-tMAX)<1e-9
             % Time boundary is reached
             yIN = y(end,:)';  % This will be mapped to yOUT below.
@@ -177,7 +180,7 @@ function [yOUT, zOUT, tOUT, varargout] = HybridDynamics(yIN, zIN, p, SMA_L, SMA_
             break;  
         end    
         
-        if isempty(ieOUT)        
+        if isempty(ieOUT)
             % No event occurred. The simulation ran out of time without
             % reaching the terminating event. Map final continuous states
             % (discrete states were not altered) and set time to -1:

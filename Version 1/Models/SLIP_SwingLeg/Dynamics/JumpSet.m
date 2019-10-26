@@ -50,6 +50,7 @@ function evntVal = JumpSet(y, z, p, varargin)
     % "y(3)" while still operating with vectors and not with structs.
     % We keep the index-structs in memory to speed up processing
     persistent contStateIndices  systParamIndices discStateIndices
+    global active_leg
     if isempty(contStateIndices)  || isempty(systParamIndices) || isempty(discStateIndices)
         [~, ~, contStateIndices] = ContStateDefinition();
         [~, ~, systParamIndices] = SystParamDefinition();
@@ -77,7 +78,7 @@ function evntVal = JumpSet(y, z, p, varargin)
     
     % Event 1: Detect touchdown left 
     % Change the guard function to select different events
-    if (z(discStateIndices.lphase) == 1) && (z(discStateIndices.rphase) == 1) && (v_footl < 0) 
+    if (z(discStateIndices.lphase) == 1) && (z(discStateIndices.rphase) == 1) && (v_footl < 0) && strcmp(active_leg,'left')
         ft_height = y(contStateIndices.y) - l_legL * cos(alpha + phiL);
         evntVal(1) = -ft_height;
     else
@@ -87,7 +88,7 @@ function evntVal = JumpSet(y, z, p, varargin)
     
     % *******
     % Event 2: Detect liftoff left
-    if z(discStateIndices.lphase) == 2 %(i.e., in stance)
+    if z(discStateIndices.lphase) == 2 && strcmp(active_leg,'left')%(i.e., in stance) 
         l_leg = sqrt((y(contStateIndices.x)-z(discStateIndices.lcontPt))^2 + (y(contStateIndices.y)-0)^2);
         evntVal(2) =l_leg - l_legL;
     else
@@ -107,7 +108,7 @@ function evntVal = JumpSet(y, z, p, varargin)
     % *******
     % Event 4: Detect touchdown right
     % Change the guard function to enable th
-    if (z(discStateIndices.rphase) == 1)  && 0
+    if (z(discStateIndices.rphase) == 1)   && (v_footr < 0)  && strcmp(active_leg,'right')
         ft_height = y(contStateIndices.y) - r_legL * cos(alpha + phiR);
         evntVal(4) = -ft_height;
 
@@ -118,7 +119,7 @@ function evntVal = JumpSet(y, z, p, varargin)
     
     % *******
     % Event 5: Detect liftoff right
-    if (z(discStateIndices.rphase) == 2) 
+    if (z(discStateIndices.rphase) == 2) && strcmp(active_leg,'right')
         l_leg = sqrt((y(contStateIndices.x)-z(discStateIndices.rcontPt))^2 + (y(contStateIndices.y)-0)^2);
         evntVal(5) =l_leg - r_legL;
     else

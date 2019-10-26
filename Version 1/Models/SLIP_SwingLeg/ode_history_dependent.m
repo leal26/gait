@@ -5,6 +5,7 @@ function [t,y,teOUT,yeOUT,ieOUT] = ode_history_dependent(F_ty, h, t, y_initial, 
 % h: Step_Value = input('Enter Step Value: ')
 % Routine starts here
 % t=t_span(1):h:t_span(2);
+global active_leg
 y=zeros(length(y_initial),length(t));
 y(:,1)=y_initial;
 prev_teOUT = [-1 -1 -1 -1 -1 -1];
@@ -19,13 +20,30 @@ for i=1:(length(t)-1)
     % Determine if an event happened
     [teOUT,~,~] = Events(0,y(:,i+1));
     inflections = sign(prev_teOUT).*sign(teOUT);
+
     if i>1
         for j=1:length(inflections)
             if inflections(j) <= 0
-                done = true;
-                break
+                if i~= length(t)-1
+                    done = true;
+                    break
+%                     if (j==1 || j==2) && strcmp(active_leg, 'left')
+%                         ieOUT = j;
+%                         break
+%                     elseif (j==4 || j==5) && strcmp(active_leg, 'right')
+%                         ieOUT = j;
+%                         break
+%                     elseif (j==3 || j==6)
+%                         ieOUT = j;
+%                         break
+%                     else
+%                         disp(j)
+%                         done = false;
+%                     end
+                end
             end
         end
+
     end
     prev_teOUT = teOUT;
     if done
@@ -38,10 +56,18 @@ end
 yeOUT = y(:,end);
 teOUT = t(end);
 % if not last step
+% if i~= length(t)-1
+%     if (j==1 || j==2) && strcmp(active_leg, 'left')
+%         ieOUT = j;
+%     elseif (j==4 || j==5) && strcmp(active_leg, 'right')
+%         ieOUT = j;
+%     elseif (j==3 || j==6)
+%         ieOUT = j;
+%     end
+% end
 if i~= length(t)-1
-    ieOUT = j;
+   ieOUT = j;
 end
-
 %Checking custom routine and MATLAB function ode45
 % [t_c,y_c] = ode45(F_ty,t,y_initial);
 % %Plot in one figure
