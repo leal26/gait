@@ -84,10 +84,10 @@ function [yPLUS, zPLUS, isTerminal] = JumpMap(yMINUS, zMINUS, p, event)
             
             %%%%%%%%%%%%%%% For symmertical gaits
             % Record left leg states
-            z_lcontPt   = yMINUS(contStateIndices.x) + l_legL * sin(phiL + alpha);
-            zPLUS_phiL  = 2;
-            yPLUS_phiL  = atan2(z_lcontPt-yMINUS(contStateIndices.x), yMINUS(contStateIndices.y)-0) - alpha ;
-            yPLUS_dphiL = -yMINUS(contStateIndices.dx)*cos(yPLUS_phiL + alpha) - yMINUS(contStateIndices.dy)*sin(yPLUS_phiL + alpha);
+            % z_lcontPt   = yMINUS(contStateIndices.x) + l_legL * sin(phiL + alpha);
+            % zPLUS_phiL  = 2;
+            % yPLUS_phiL  = atan2(z_lcontPt-yMINUS(contStateIndices.x), yMINUS(contStateIndices.y)-0) - alpha ;
+            % yPLUS_dphiL = -yMINUS(contStateIndices.dx)*cos(yPLUS_phiL + alpha) - yMINUS(contStateIndices.dy)*sin(yPLUS_phiL + alpha);
             
             % Only simulate half of the stride. Switch left and right legs 
             % states to make them periodic. (The order of the following code 

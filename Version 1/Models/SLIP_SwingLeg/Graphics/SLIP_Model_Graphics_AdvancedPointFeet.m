@@ -53,6 +53,8 @@ classdef SLIP_Model_Graphics_AdvancedPointFeet < OutputCLASS
     methods
         % Constructor:
         function obj = SLIP_Model_Graphics_AdvancedPointFeet(p)
+            global SMA_L_database
+            global SMA_R_database
             obj.slowDown = 1; % Run this in real time.
             obj.rate     = 0.01;   % with 25 fps
             
@@ -83,9 +85,13 @@ classdef SLIP_Model_Graphics_AdvancedPointFeet < OutputCLASS
             y = 1.2;
             l_leg = 1;
             phi_body =0;
-
+            try
+                MVF = SMA_L_database.MVF(SMA_L_database.index,1);
+            catch
+                MVF = 0;
+            end
             % The representation of the back left leg as a line object:
-            obj.SpringLine_l = DrawLegsLeftPointFeet(x,y,l_leg,phi_body);
+            obj.SpringLine_l = DrawLegsLeftPointFeet(x,y,l_leg,phi_body,MVF);
             
             vert_x_out = [-20 100 100 -20];
             vert_y_out = [0 0 -40 -40];
@@ -135,7 +141,8 @@ classdef SLIP_Model_Graphics_AdvancedPointFeet < OutputCLASS
         
         % Updated function.  Is called by the integrator:
         function obj = update(obj, y, z, ~, ~)
-           
+        global SMA_L_database
+        global SMA_R_database   
         % Get a mapping for the state and parameter vectors.  This allows us
         % to use a more readable syntax: "y(contStateIndices.dy)" instead of
         % "y(3)" while still operating with vectors and not with structs.
@@ -170,13 +177,22 @@ classdef SLIP_Model_Graphics_AdvancedPointFeet < OutputCLASS
                 phi_R = atan2(z(discStateIndices.rcontPt)-y(contStateIndices.x), y(contStateIndices.y)-0);
         end    
    
-    
+        try
+            MVF_L = SMA_L_database.MVF(SMA_L_database.index,1);
+        catch
+            MVF_L = 0;
+        end
+        try
+            MVF_R = SMA_R_database.MVF(SMA_R_database.index,1);
+        catch
+            MVF_R = 0;
+        end
         %  left Leg
-        SetDrawLegsPointFeet(x_,y_,LegL,phi_L,obj.SpringLine_l);    
+        SetDrawLegsPointFeet(x_,y_,LegL,phi_L,obj.SpringLine_l, MVF_L);    
         % The representation of the body as ellipse object:
         SetDrawBody(x_,y_, phi_body ,obj.Body);
         %  right Leg
-        SetDrawLegsPointFeet(x_,y_,LegR,phi_R,obj.SpringLine_r);
+        SetDrawLegsPointFeet(x_,y_,LegR,phi_R,obj.SpringLine_r, MVF_R);
         
         phi = linspace(0, pi/2, 10);
         vert_x = [0,sin(phi)*0.1,0];

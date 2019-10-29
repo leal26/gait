@@ -1,5 +1,5 @@
 
-function  LegParts=DrawLegsLeftPointFeet(x_o,y_o,l_leg, gamma_leg)
+function  LegParts=DrawLegsLeftPointFeet(x_o,y_o,l_leg, gamma_leg, MVF)
 comp= l_leg - 1;
 T= [ cos(gamma_leg), -sin(gamma_leg);
          sin(gamma_leg),  cos(gamma_leg)];
@@ -16,7 +16,15 @@ XCOl = 202;
 COLOR = [XCOl XCOl XCOl]/256;           
 vsp1=[vert_xsp1',vert_ysp1'];
 fsp1=[linspace(1,14,14)',linspace(2,15,14)'];
-L1=patch('faces', fsp1, 'vertices', vsp1,'linewidth',5,'EdgeColor',[0 68 158]/256);
+Red = [0.6350, 0.0780, 0.1840];
+Blue = [0 68/256 .5]; %[0 68 158]/256
+if isnan(MVF) || isempty(MVF)
+    spring_color=Red;
+else
+    spring_color = Blue*MVF/.5 + Red*(.5-MVF)/.5;
+end
+% spring_color = [0 68 158]/256;
+L1=patch('faces', fsp1, 'vertices', vsp1,'linewidth',5,'EdgeColor',spring_color);
 
 % Upper Leg**************************************
 % 1. outline of upper leg
@@ -77,7 +85,7 @@ vert_ysp2 = vert_sp2_rot (2,:) + y_o ;
 
 vsp2=[vert_xsp2(1:14)',vert_ysp2(1:14)'];
 fsp2=[1,2;3,4;5,6;7,8; 9,10;11,12;13,14];
-L5=patch('faces', fsp2, 'vertices', vsp2,'linewidth',5,'EdgeColor',[0 68 158]/256);
+L5=patch('faces', fsp2, 'vertices', vsp2,'linewidth',5,'EdgeColor',spring_color);
 
 L2=patch('faces', ful, 'vertices', vul,'linewidth',3,'FaceColor',COLOR);
 LegParts = struct('L_Sp1',L1,'L_Upo',L2,'L_low',L4,'L_Sp2',L5);

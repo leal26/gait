@@ -199,7 +199,7 @@ function [yOUT, zOUT, tOUT, varargout] = HybridDynamics(yIN, zIN, p, SMA_L, SMA_
         
         NoE=NoE+1;
         
-        if NoE> 12   
+        if NoE> 12
             % incorrect footfall sequences, terminate integration;
             break;
         end

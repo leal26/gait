@@ -58,8 +58,8 @@ addpath([GaitCreationDir,slash,'Models',slash,'SLIP_SwingLeg',slash,'Inputs;'])
 
 % IP.duty = 1.;           
 IP.frequency = 2.8571  ;
-IP.mean = 375.0000   ;
-IP.amplitude = 14.2857    ;
+IP.mean = 386   ;
+IP.amplitude = 0    ;
 IP.phase = 0.3857;
 IP.mass = 10; % kg (used for normalizing)
 IP.gravity = 9.80665; % m/s2 (used for normalizing)
@@ -68,10 +68,10 @@ SMA_density = 6450; %kg/m3
 %% (c) Display the solution:
 SMA_L_database = [];
 SMA_R_database = [];
-pCYC(systParamIndices.k) = 20; % Stance leg stiffness
+pCYC(systParamIndices.k) = NaN; % Stance leg stiffness
 
 figure(1)
-simOptions.tMAX = 6; 
+simOptions.tMAX = 20; 
 recOUTPUT = RecordStateCLASS();
 recOUTPUT.rate = 0.001;
 % figure
@@ -83,11 +83,11 @@ plotStates = [ contStateIndices.x, contStateIndices.dx,contStateIndices.y, contS
 plot(simRES.t,simRES.continuousStates(plotStates,:))
 legend(simRES.continuousStateNames(plotStates));
 ContactForces(simRES.continuousStates(:,:),simRES.discreteStates(:,:),pCYC,simRES.t, SMA_L, SMA_R);
-% sma_plotting(simRES.t, SMA_L)
-% phase_space(simRES.continuousStates(plotStates,:))
-% disp(calculate_specific_power(SMA_R_database.sigma(1:length(simRES.t)), ...
-%                              SMA_R_database.eps(1:length(simRES.t)), ...
-%                              SMA_density, recOUTPUT.rate, sqrt(1/IP.gravity)))
+sma_plotting(simRES.t, SMA_L)
+phase_space(simRES.continuousStates(plotStates,:))
+disp(calculate_specific_power(SMA_R_database.sigma(1:length(simRES.t)), ...
+                             SMA_R_database.eps(1:length(simRES.t)), ...
+                             SMA_density, recOUTPUT.rate, 1))
 
 % Show animations
 SMA_L_database = [];

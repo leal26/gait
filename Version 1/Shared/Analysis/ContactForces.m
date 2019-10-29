@@ -68,7 +68,15 @@ switch z(1,i)
                      case 1 %(flight = 4 & 6)  
                             l_legl = sqrt((y(1,i)-z(2,i))^2 + (y(3,i)-0)^2);
                             gamma_legl = atan2(z(2,i)-y(1,i), y(3,i)-0);
-                            f_springl = (p(2) - l_legl) * p(4);
+                            if isnan(p(4))
+                                % eps = (p(2)-l_legr)/p(2);
+                                % SMA_R.eps = eps*l_legr*20/1.138989e+04;
+                                sigma = SMA_L_database.sigma(i);
+                                F_sma = sigma*2*3.1415*SMA_L.r^3/(3*SMA_L.R)/SMA_L.norm; 
+                                f_springl=F_sma;
+                            else
+                                f_springl=(p(2) - l_legl) * p(4);
+                            end
                             contactF.values.lx(i) = f_springl * -sin(gamma_legl);  
                             contactF.values.ly(i) = f_springl * +cos(gamma_legl);     
                             
@@ -81,15 +89,35 @@ switch z(1,i)
                             rLength(i) = 1;
              
                       case 2 %(stance = 5)
+                           % left
                             l_legl = sqrt((y(1,i)-z(2,i))^2 + (y(3,i)-0)^2);
                             gamma_legl = atan2(z(2,i)-y(1,i), y(3,i)-0);
-                            f_springl = (p(2) - l_legl) * p(4);
+                            if isnan(p(4))
+                                % eps = (p(2)-l_legr)/p(2);
+                                % SMA_R.eps = eps*l_legr*20/1.138989e+04;
+                                sigma = SMA_L_database.sigma(i);
+                                F_sma = sigma*2*3.1415*SMA_L.r^3/(3*SMA_L.R)/SMA_L.norm; 
+                                f_springl=F_sma;
+                            else
+                                f_springl=(p(2) - l_legl) * p(4);
+                            end
+                            
                             contactF.values.lx(i) = f_springl * -sin(gamma_legl);
                             contactF.values.ly(i) = f_springl * +cos(gamma_legl);
                             
+                            % right
                             l_legr = sqrt((y(1,i)-z(4,i))^2 + (y(3,i)-0)^2);
                             gamma_legr = atan2(z(4,i)-y(1,i), y(3,i)-0);
-                            f_springr = (p(2) - l_legr) * p(4);
+                             if isnan(p(4))
+                                % eps = (p(2)-l_legr)/p(2);
+                                % SMA_R.eps = eps*l_legr*20/1.138989e+04;
+                                T = SMA_R_database.T(i);
+                                sigma = SMA_R_database.sigma(i);
+                                F_sma = sigma*2*3.1415*SMA_R.r^3/(3*SMA_R.R)/SMA_R.norm; 
+                                f_springr=F_sma;
+                            else
+                                f_springr=(p(2) - l_legr) * p(4);
+                            end
                             contactF.values.rx(i) = f_springr * -sin(gamma_legr);
                             contactF.values.ry(i) = f_springr * +cos(gamma_legr);
                             

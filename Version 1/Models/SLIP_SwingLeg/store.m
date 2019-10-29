@@ -3,7 +3,7 @@ global SMA_L_database
 global SMA_R_database
 %UNTITLED9 Summary of this function goes here
 %   Detailed explanation goes here
-n = 10000;
+n = 100000;
 
 if isempty(SMA_L_database)
     SMA_L_database.index = 2;

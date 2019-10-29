@@ -82,13 +82,13 @@ function dydt = FlowMap(t, y, z, p, SMA_L, SMA_R, varargin)
         case 2 %(stance = 2)
             LegL = sqrt((y(contStateIndices.x)-z(discStateIndices.lcontPt))^2 + (y(contStateIndices.y)-0)^2);
             if isnan(k)
-                eps = (l_legL-LegL)/l_legL;
+                u = l_legL-LegL;
                 counter = counter + 1;
-                SMA_L.eps = eps*l_legL*20/1.138989e+04*3.7427/8.8888;
+                SMA_L.eps = u*3*SMA_L.r/(8*3.1415*SMA_L.N*SMA_L.R^2);
                 SMA_L.T = SMA_L.T_function(t);
                 [SMA_L] = OneD_SMA_Model(counter, SMA_L);
-                F_sma = SMA_L.area*SMA_L.sigma/SMA_L.norm;% F_sma = k*SMA_R.eps/10;  
-                fprintf('Right: %d, %d, %d\n', t, SMA_L.eps, SMA_L.area*SMA_L.sigma/SMA_L.norm/u)
+                F_sma = SMA_L.sigma*2*3.1415*SMA_L.r^3/(3*SMA_L.R)/SMA_L.norm;
+                % fprintf('Left: %d, %d, %d\n', t, SMA_L.eps, SMA_L.area*SMA_L.sigma/SMA_L.norm/u)
                 Fl=F_sma;
             else
                 Fl=k*(l_legL-LegL);
