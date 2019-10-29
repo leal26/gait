@@ -177,7 +177,7 @@ solveOptions.tMAX = 10;
                                                             yOPTIM,  zOPTIM, pOPTIM,... 
                                                             yPERIOD, zPERIOD, ...
                                                             solveOptions);
-save('\\coe-fs.engr.tamu.edu\Grads\leal26\Documents\GitHub\gait\periodic_solution.mat')                             
+save('\\coe-fs.engr.tamu.edu\Grads\leal26\Documents\GitHub\gait\periodic_solution.mat')                    
 %% (c) Display the solution:
 SMA_L_database = [];
 SMA_R_database = [];
@@ -195,6 +195,8 @@ plotStates = [ contStateIndices.x, contStateIndices.dx,contStateIndices.y, contS
 plot(simRES.t,simRES.continuousStates(plotStates,:))
 legend(simRES.continuousStateNames(plotStates));
 ContactForces(simRES.continuousStates(:,:),simRES.discreteStates(:,:),pCYC,simRES.t, SMA_L, SMA_R);
+
+
 
 % Show animations
 SMA_L_database = [];

@@ -57,10 +57,10 @@ addpath([GaitCreationDir,slash,'Models',slash,'SLIP_SwingLeg',slash,'Inputs;'])
 
 
 % IP.duty = 1.;           
-IP.frequency = 2.8571  ;
-IP.mean = 386   ;
-IP.amplitude = 0    ;
-IP.phase = 0.3857;
+IP.frequency = sqrt(5)/2/pi;
+IP.mean = 390   ;
+IP.amplitude = 0.3    ;
+IP.phase = 0.;
 IP.mass = 10; % kg (used for normalizing)
 IP.gravity = 9.80665; % m/s2 (used for normalizing)
 SMA_density = 6450; %kg/m3

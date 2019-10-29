@@ -6,12 +6,14 @@ function [t,y,teOUT,yeOUT,ieOUT] = ode_history_dependent(F_ty, h, t, y_initial, 
 % Routine starts here
 % t=t_span(1):h:t_span(2);
 global active_leg
+global SMA_R_database
+global SMA_L_database
+tol = -1e5;
+
 y=zeros(length(y_initial),length(t));
 y(:,1)=y_initial;
 prev_teOUT = [-1 -1 -1 -1 -1 -1];
 done = false;
-
-
 for i=1:(length(t)-1)
     % Update data for output
     OutputFcn(t(i),y(:,i),[]);
@@ -27,23 +29,15 @@ for i=1:(length(t)-1)
                 if i~= length(t)-1
                     done = true;
                     break
-%                     if (j==1 || j==2) && strcmp(active_leg, 'left')
-%                         ieOUT = j;
-%                         break
-%                     elseif (j==4 || j==5) && strcmp(active_leg, 'right')
-%                         ieOUT = j;
-%                         break
-%                     elseif (j==3 || j==6)
-%                         ieOUT = j;
-%                         break
-%                     else
-%                         disp(j)
-%                         done = false;
-%                     end
                 end
             end
         end
-
+        if (SMA_R_database.sigma(SMA_R_database.index)<tol) || (SMA_L_database.sigma(SMA_L_database.index)<tol) || y(2,i+1) < 0
+            disp(SMA_R_database.sigma(SMA_R_database.index))
+            disp(SMA_L_database.sigma(SMA_L_database.index))
+            done = true;
+            ieOUT = [];
+        end
     end
     prev_teOUT = teOUT;
     if done
@@ -55,32 +49,11 @@ end
 
 yeOUT = y(:,end);
 teOUT = t(end);
-% if not last step
-% if i~= length(t)-1
-%     if (j==1 || j==2) && strcmp(active_leg, 'left')
-%         ieOUT = j;
-%     elseif (j==4 || j==5) && strcmp(active_leg, 'right')
-%         ieOUT = j;
-%     elseif (j==3 || j==6)
-%         ieOUT = j;
-%     end
-% end
+
 if i~= length(t)-1
    ieOUT = j;
 end
-%Checking custom routine and MATLAB function ode45
-% [t_c,y_c] = ode45(F_ty,t,y_initial);
-% %Plot in one figure
-% figure(1)
-% plot(t,y)
-% hold on
-% plot(t_c,y_c, 'o')
-% hold off
-% y_c2=y_c';
-% %Calculates error between custom runge-kutta routine and MATLAB function
-% %ode45
-% disp('Error between Runge-Kutta and ode45')
-% err = immse(y,y_c2)
+
 end
 
 function [y_i1] = next_y(F_ty, y, t, h, i, store)

@@ -18,10 +18,11 @@ vsp1=[vert_xsp1',vert_ysp1'];
 fsp1=[linspace(1,14,14)',linspace(2,15,14)'];
 Red = [0.6350, 0.0780, 0.1840];
 Blue = [0 68/256 .5]; %[0 68 158]/256
+MVF_max = 1;
 if isnan(MVF) || isempty(MVF)
     spring_color=Red;
 else
-    spring_color = Blue*MVF/.5 + Red*(.5-MVF)/.5;
+    spring_color = Blue*MVF/MVF_max+ Red*(MVF_max-MVF)/MVF_max;
 end
 % spring_color = [0 68 158]/256;
 L1=patch('faces', fsp1, 'vertices', vsp1,'linewidth',5,'EdgeColor',spring_color);
