@@ -8,7 +8,7 @@ function [t,y,teOUT,yeOUT,ieOUT] = ode_history_dependent(F_ty, h, t, y_initial, 
 global active_leg
 global SMA_R_database
 global SMA_L_database
-tol = -1e5;
+tol = -1e7;
 
 y=zeros(length(y_initial),length(t));
 y(:,1)=y_initial;
@@ -31,10 +31,10 @@ for i=1:(length(t)-1)
                     break
                 end
             end
-        end
+         end
         if (SMA_R_database.sigma(SMA_R_database.index)<tol) || (SMA_L_database.sigma(SMA_L_database.index)<tol) || y(2,i+1) < 0
-            disp(SMA_R_database.sigma(SMA_R_database.index))
-            disp(SMA_L_database.sigma(SMA_L_database.index))
+%             disp(SMA_R_database.sigma(SMA_R_database.index))
+%             disp(SMA_L_database.sigma(SMA_L_database.index))
             done = true;
             ieOUT = [];
         end
@@ -50,8 +50,12 @@ end
 yeOUT = y(:,end);
 teOUT = t(end);
 
-if i~= length(t)-1
-   ieOUT = j;
+try
+   isempty(ieOUT);
+catch
+    if i~= length(t)-1
+       ieOUT = j;
+    end
 end
 
 end

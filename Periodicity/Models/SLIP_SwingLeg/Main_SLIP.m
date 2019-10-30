@@ -177,7 +177,7 @@ solveOptions.tMAX = 10;
                                                             yOPTIM,  zOPTIM, pOPTIM,... 
                                                             yPERIOD, zPERIOD, ...
                                                             solveOptions);
-save('\\coe-fs.engr.tamu.edu\Grads\leal26\Documents\GitHub\gait\periodic_solution.mat')                    
+                  
 %% (c) Display the solution:
 SMA_L_database = [];
 SMA_R_database = [];
@@ -187,9 +187,10 @@ figure(1)
 simOptions.tMAX = 5; 
 recOUTPUT = RecordStateCLASS();
 [yOUT, zOUT, tOUT, recOUTPUT] = HybridDynamics(yCYC, zCYC, pCYC, SMA_L, SMA_R, recOUTPUT, simOptions);
-disp(recOUTPUT)
 simRES = recOUTPUT.retrieve();
-disp(simRES)
+
+save('\\coe-fs.engr.tamu.edu\Grads\leal26\Documents\GitHub\gait\periodic_solution.mat')  
+
 % Define which states are plotted:
 plotStates = [ contStateIndices.x, contStateIndices.dx,contStateIndices.y, contStateIndices.dy, contStateIndices.phiL, contStateIndices.dphiL,contStateIndices.phiR, contStateIndices.dphiR];
 plot(simRES.t,simRES.continuousStates(plotStates,:))

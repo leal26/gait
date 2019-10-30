@@ -56,15 +56,16 @@ addpath([GaitCreationDir,slash,'Models',slash,'SLIP_SwingLeg',slash,'phase_diagr
 addpath([GaitCreationDir,slash,'Models',slash,'SLIP_SwingLeg',slash,'Inputs;'])
 
 
-% IP.duty = 1.;           
+% IP.duty = 1.;   
 IP.frequency = sqrt(5)/2/pi;
 IP.mean = 390   ;
-IP.amplitude = 0.3    ;
-IP.phase = 0.;
+IP.amplitude = 0 ;
+IP.phase = 0;
 IP.mass = 10; % kg (used for normalizing)
 IP.gravity = 9.80665; % m/s2 (used for normalizing)
 SMA_density = 6450; %kg/m3
-[SMA_L, SMA_R] = define_SMA(IP, IP);                                                  
+[SMA_L, SMA_R] = define_SMA(IP, IP);
+SMA_R.phase = 0;
 %% (c) Display the solution:
 SMA_L_database = [];
 SMA_R_database = [];
@@ -73,9 +74,10 @@ pCYC(systParamIndices.k) = NaN; % Stance leg stiffness
 figure(1)
 simOptions.tMAX = 20; 
 recOUTPUT = RecordStateCLASS();
-recOUTPUT.rate = 0.001;
+recOUTPUT.rate = 0.01;
 % figure
 % hold on
+
 [yOUT, zOUT, tOUT, recOUTPUT] = HybridDynamics(yCYC, zCYC, pCYC, SMA_L, SMA_R, recOUTPUT, simOptions);
 simRES = recOUTPUT.retrieve();
 % Define which states are plotted:
@@ -92,9 +94,10 @@ disp(calculate_specific_power(SMA_R_database.sigma(1:length(simRES.t)), ...
 % Show animations
 SMA_L_database = [];
 SMA_R_database = [];
+[SMA_L, SMA_R] = define_SMA(IP, IP); 
 graphOUTPUT = SLIP_Model_Graphics_AdvancedPointFeet(pCYC); % Must be called again with new parameters p, such that the new angle of attack is visualized
 [yOUT, zOUT, tOUT] = HybridDynamics(yCYC, zCYC, pCYC, SMA_L, SMA_R, graphOUTPUT, simOptions);
 
-recOUTPUT = RecordStateCLASS();
+% recOUTPUT = RecordStateCLASS();
 % [yOUT, zOUT, tOUT, recOUTPUT] = HybridDynamics(yCYC, zCYC, pCYC, SMA_L, SMA_R,recOUTPUT, simOptions);
 % simRES = recOUTPUT.retrieve();

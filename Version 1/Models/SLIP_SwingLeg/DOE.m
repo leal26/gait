@@ -6,6 +6,7 @@ global SMA_L_database
 global SMA_R_database
 
 load('\\coe-fs.engr.tamu.edu\Grads\leal26\Documents\GitHub\gait\periodic_solution.mat')  
+plotStates = [ contStateIndices.x, contStateIndices.dx,contStateIndices.y, contStateIndices.dy, contStateIndices.phiL, contStateIndices.dphiL,contStateIndices.phiR, contStateIndices.dphiR];
 y_periodic = simRES.continuousStates(plotStates,:);
 
 %% (a) Setting up working environment
@@ -56,34 +57,34 @@ addpath([GaitCreationDir,slash,'Models',slash,'SLIP_SwingLeg',slash,'SMA_tempera
 addpath([GaitCreationDir,slash,'Models',slash,'SLIP_SwingLeg',slash,'phase_diagram;'])
 addpath([GaitCreationDir,slash,'Models',slash,'SLIP_SwingLeg',slash,'Inputs;'])
                                               
-%% (c) DOE (frequency, mean, delta, phase):
-bounds = [[375,390]; ...
-          [0,20]; ...
+%% (c) DOE (mean, delta, phase for left and right legs):
+bounds = [[375,390]; ... 
+          [0,5]; ...
+          [0,.9]; ...
           [0,.9]];
-parameters_nd = fullfact([2,2,2]);
+parameters_nd = fullfact([8,8,8,8]);
 parameters = parameters_nd - 1;
-for i=1:3
+for i=1:length(bounds)
     parameters(:,i) = bounds(i,1) + (bounds(i,2) - bounds(i,1))*parameters(:,i)/max(parameters(:,i));
 end
 result_matrix = [parameters, NaN*ones([length(parameters) 6])];
 
-simOptions.tMAX = 20;
+simOptions.tMAX = 40;
 pCYC(systParamIndices.k) = NaN; % Stance leg stiffness
 IP.frequency = sqrt(5)/2/pi;
 IP.mass = 10; % kg (used for normalizing)
 IP.gravity = 9.80665; % m/s2 (used for normalizing)
 SMA_density = 6450; %kg/m3
 for i=1:length(parameters)
-    SMA_L_database = [];
-    SMA_R_database = [];
     
     IP.mean = parameters(i,1);
     IP.amplitude = parameters(i,2);
     IP.phase = parameters(i,3);
     [SMA_L, SMA_R] = define_SMA(IP, IP);  
+    SMA_R.phase = parameters(i,4);
     
     recOUTPUT = RecordStateCLASS();
-    recOUTPUT.rate = 0.001;
+    recOUTPUT.rate = 0.01;
     % Checking Austenite constraint
     success = true;
     if SMA_R.T_function(0) >= SMA_R.A_f
@@ -94,8 +95,8 @@ for i=1:length(parameters)
 
             if min(simRES.continuousStates(contStateIndices.y,:)) > 0
                 max_x = max(simRES.continuousStates(contStateIndices.x,:));
-                max_y = max(simRES.continuousStates(contStateIndices.y,:));
-                max_dy = max(simRES.continuousStates(contStateIndices.dy,:));
+                av_dx = mean(simRES.continuousStates(contStateIndices.dx,end-300:end));
+                av_dy = mean(simRES.continuousStates(contStateIndices.dy,end-300:end));
                 power_R = calculate_specific_power(SMA_R_database.sigma(1:length(simRES.t)), ...
                                              SMA_R_database.eps(1:length(simRES.t)), ...
                                              SMA_density, recOUTPUT.rate, 1);
@@ -113,16 +114,16 @@ for i=1:length(parameters)
     end
     if ~success
         max_x = 9999;
-        max_y = 9999;
-        max_dy = 9999;
+        av_dx = 9999;
+        av_dy = 9999;
         power_L = 9999;
         power_R = 9999;
     end
-    fprintf('%f\t%f\t%f\t%f\t%f\t%f\t%f\n', i, max(simRES.t), max_x, max_y, max_dy, power_L, power_R)
+    fprintf('%f\t%f\t%f\t%f\t%f\t%f\t%f\n', i, max(simRES.t), max_x, av_dx, av_dy, power_L, power_R)
     result_matrix(i,end-5) = max(simRES.t);
     result_matrix(i,end-4) = max_x;
-    result_matrix(i,end-3) = max_y;
-    result_matrix(i,end-2) = max_dy;
+    result_matrix(i,end-3) = av_dx;
+    result_matrix(i,end-2) = av_dy;
     result_matrix(i,end-1) = power_L;
     result_matrix(i,end) = power_R;
 end
@@ -130,7 +131,7 @@ end
 
 % Write to file
 fileID = fopen(strcat('DOE.txt'),'w');
-fprintf(fileID,'frequency\tmean\tdelta\tphase\ttime\tx\ty\tdy\tpower_L\tpower_R\n');
+fprintf(fileID,'mean\tdelta\tphaseL\tphaseR\ttime\tx\tdx\tdy\tpower_L\tpower_R\n');
 formatSpec = '%8.3f\t%8.3f\t%8.3f\t%8.3f\t%8.3f\t%8.3f\t%8.3f\t%8.3f\t%8.3f\t%8.3f\n';
 for ii=1:length(parameters)
     fprintf(fileID,formatSpec, result_matrix(ii,:));
@@ -138,5 +139,6 @@ end
 fclose(fileID);
 
 result_matrix(result_matrix==9999) = NaN;
-save('DOE.mat', 'result_matrix', 'parameters_nd')
-design_plots(result_matrix, y_periodic)
+output = result_matrix(~isnan(result_matrix(:,end)),:);
+save('DOE.mat', 'result_matrix', 'parameters_nd', 'output')
+design_plots(output, y_periodic);
