@@ -102,7 +102,6 @@ function dydt = FlowMap(t, y, z, p, SMA_L, SMA_R, varargin)
             LegR = r_legL;
             Fr=0;
             phi_R = phiR; % convert to inertia frame
-            SMA_R = 0;
         case 2 %(stance = 2)
             LegR = sqrt((y(contStateIndices.x)-z(discStateIndices.rcontPt))^2 + (y(contStateIndices.y)-0)^2);
             if isnan(k)
@@ -124,7 +123,7 @@ function dydt = FlowMap(t, y, z, p, SMA_L, SMA_R, varargin)
             phi_R = atan2(z(discStateIndices.rcontPt)-y(contStateIndices.x), y(contStateIndices.y)-0) - alpha; % in body frame
     end                         
     
-    if store_flag
+    if store_flag && isnan(k)
         store(SMA_L, SMA_R)
 %         scatter(t,Fr,'k')
     end

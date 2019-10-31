@@ -2,7 +2,7 @@ function output = cost(parameters, lb, ub,yCYC, zCYC, pCYC, contStateIndices)
     global SMA_L_database
     global SMA_R_database
     parameters = (ub-lb).*parameters + lb;
-
+%     disp(parameters)
     IP.mean = parameters(1);
     IP.amplitude = parameters(2);
     IP.phase = parameters(3);

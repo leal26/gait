@@ -84,6 +84,10 @@ function [yOUT, zOUT, tOUT, varargout] = HybridDynamics(yIN, zIN, p, SMA_L, SMA_
     global counter
     global active_leg
     counter = 1;
+    active_leg = 'left';
+    global active_leg
+    SMA_R_database = [];
+    SMA_L_database = [];
     % *********************************************************************
     % INPUT HANDLING
     %   Check the number of parameters:
@@ -125,16 +129,7 @@ function [yOUT, zOUT, tOUT, varargout] = HybridDynamics(yIN, zIN, p, SMA_L, SMA_
     else
         tIN = 0;
     end
-    % Define basic ode options, which can be overwritten by the user
-    % provided values
-    odeOPTIONS = odeset('RelTol',1e-6,...
-                        'AbsTol',1e-12,...
-                        'MaxStep',0.01);
-    if isfield(options,'odeOPTIONS') % overwrite with the user provided values
-        odeOPTIONS = odeset(odeOPTIONS, options.odeOPTIONS);
-    end
-    % Set up the options for output and event detection (do this last, as these should never be overwritten by the user):
-    odeOPTIONS = odeset(odeOPTIONS,'Events',@Events,'OutputFcn',@OutputFcn);
+
     % END INPUT HANDLING
     % *********************************************************************
     
@@ -168,11 +163,12 @@ function [yOUT, zOUT, tOUT, varargout] = HybridDynamics(yIN, zIN, p, SMA_L, SMA_
         % the results are stored in rows.
         % [t,y,teOUT,yeOUT,ieOUT] = ode_history_dependent(@(t,y) ODE(t,y,SMA_L,SMA_R),tspan,yIN,odeOPTIONS);
         % tspan = [0 5];
-        disp(active_leg)
-        try
+        % disp(active_leg)
+%           try
+            
             [t,y,teOUT,yeOUT,ieOUT] = ode_history_dependent(@(t,y) ODE(t,y,SMA_L,SMA_R),outputIN.rate, tspan, yIN, @Events, @OutputFcn);
-            disp(teOUT)
-            disp(ieOUT)
+%              disp(teOUT)
+%              disp(ieOUT)
             if abs(t(end)-tMAX)<1e-9
                 % Time boundary is reached
                 yIN = y(end,:)';  % This will be mapped to yOUT below.
@@ -200,16 +196,17 @@ function [yOUT, zOUT, tOUT, varargout] = HybridDynamics(yIN, zIN, p, SMA_L, SMA_
 
             NoE=NoE+1;
 
-            if NoE> 12
+            if NoE> 24
                 % incorrect footfall sequences, terminate integration;
                 break;
             end
 
-        end
-        catch
-            
+        
+%         catch
+%             break   
+%         end
+    end
     if isa(outputIN, 'SLIP_Model_Graphics_AdvancedPointFeet')
-        disp('HERE')
         close(outputIN.video);
     end
     % Map states for return values

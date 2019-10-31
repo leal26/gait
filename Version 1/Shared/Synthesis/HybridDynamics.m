@@ -84,8 +84,7 @@ function [yOUT, zOUT, tOUT, varargout] = HybridDynamics(yIN, zIN, p, SMA_L, SMA_
     global counter
     global active_leg
     counter = 1;
-    active_leg = 'right';
-    global active_leg
+
     SMA_R_database = [];
     SMA_L_database = [];
     % *********************************************************************
@@ -157,14 +156,20 @@ function [yOUT, zOUT, tOUT, varargout] = HybridDynamics(yIN, zIN, p, SMA_L, SMA_
             tspan = [tIN,tMAX];
             disp('This option should be broken')
         else
-            tspan = outputIN.getTimeVector(tIN,tMAX); 
+            try
+                tspan = tspan(length(t):end);
+                tspan(1) = t(end);
+            catch
+                tspan = outputIN.getTimeVector(tIN,tMAX); 
+            end
         end
         % NOTE: even though ode45 is provided with an initial column guess,
         % the results are stored in rows.
         % [t,y,teOUT,yeOUT,ieOUT] = ode_history_dependent(@(t,y) ODE(t,y,SMA_L,SMA_R),tspan,yIN,odeOPTIONS);
         % tspan = [0 5];
-         % disp(active_leg)
-          try
+        % disp(active_leg)
+%           try
+            
             [t,y,teOUT,yeOUT,ieOUT] = ode_history_dependent(@(t,y) ODE(t,y,SMA_L,SMA_R),outputIN.rate, tspan, yIN, @Events, @OutputFcn);
 %              disp(teOUT)
 %              disp(ieOUT)
@@ -175,7 +180,7 @@ function [yOUT, zOUT, tOUT, varargout] = HybridDynamics(yIN, zIN, p, SMA_L, SMA_
                 warning('The integration stops at the time boundary.');
                 break;  
             end    
-
+ 
             if isempty(ieOUT)
                 % No event occurred. The simulation ran out of time without
                 % reaching the terminating event. Map final continuous states
@@ -195,15 +200,15 @@ function [yOUT, zOUT, tOUT, varargout] = HybridDynamics(yIN, zIN, p, SMA_L, SMA_
 
             NoE=NoE+1;
 
-            if NoE> 60
+            if NoE> 24
                 % incorrect footfall sequences, terminate integration;
                 break;
             end
 
         
-        catch
-            break   
-        end
+%         catch
+%             break   
+%         end
     end
     if isa(outputIN, 'SLIP_Model_Graphics_AdvancedPointFeet')
         close(outputIN.video);

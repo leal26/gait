@@ -171,7 +171,7 @@ zPERIOD(discStateIndices.rcontPt) = 1;
 % An upper limit for the stride duration is set, such that the simulation
 % will be aborted if the terminal state is never reached.  In this case, an
 % error message will be created:  
-solveOptions.tMAX = 10;
+solveOptions.tMAX = 50;
 % Call the root-search function.
 [yCYC, zCYC, pCYC] =  FindPeriodicSolution(@(yIN, zIN, p, varargin) HybridDynamics(yIN, zIN, p, SMA_L, SMA_R, varargin), yINIT,   zINIT,  pINIT,... 
                                                             yOPTIM,  zOPTIM, pOPTIM,... 
