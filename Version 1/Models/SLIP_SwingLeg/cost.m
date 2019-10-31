@@ -1,8 +1,9 @@
 function output = cost(parameters, lb, ub,yCYC, zCYC, pCYC, contStateIndices)
     global SMA_L_database
     global SMA_R_database
+    global active_leg
     parameters = (ub-lb).*parameters + lb;
-%     disp(parameters)
+    % disp(parameters)
     IP.mean = parameters(1);
     IP.amplitude = parameters(2);
     IP.phase = parameters(3);
@@ -10,12 +11,13 @@ function output = cost(parameters, lb, ub,yCYC, zCYC, pCYC, contStateIndices)
     IP.frequency = sqrt(5)/2/pi;
     IP.mass = 10; % kg (used for normalizing)
     IP.gravity = 9.80665; % m/s2 (used for normalizing)
+    IP.active_leg = 'right';
     SMA_density = 6450; %kg/m3
     [SMA_L, SMA_R] = define_SMA(IP, IP);
     SMA_R.phase = parameters(4);
     
     simOptions.tIN = 0; 
-    simOptions.tMAX = 50; 
+    simOptions.tMAX = 40; 
     recOUTPUT = RecordStateCLASS();
     recOUTPUT.rate = 0.01;
     % Checking Austenite constraint
@@ -28,8 +30,8 @@ function output = cost(parameters, lb, ub,yCYC, zCYC, pCYC, contStateIndices)
 
             if min(simRES.continuousStates(contStateIndices.y,:)) > 0
                 max_x = max(simRES.continuousStates(contStateIndices.x,:));
-                av_dx = mean(simRES.continuousStates(contStateIndices.dx,end-300:end));
-                av_dy = mean(simRES.continuousStates(contStateIndices.dy,end-300:end));
+                av_dx = mean(simRES.continuousStates(contStateIndices.dx,end-10:end));
+                av_dy = mean(simRES.continuousStates(contStateIndices.dy,end-10:end));
                 power_R = calculate_specific_power(SMA_R_database.sigma(1:length(simRES.t)), ...
                                              SMA_R_database.eps(1:length(simRES.t)), ...
                                              SMA_density, recOUTPUT.rate, 1);

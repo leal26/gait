@@ -57,9 +57,9 @@ addpath([GaitCreationDir,slash,'Models',slash,'SLIP_SwingLeg',slash,'SMA_tempera
 addpath([GaitCreationDir,slash,'Models',slash,'SLIP_SwingLeg',slash,'phase_diagram;'])
 addpath([GaitCreationDir,slash,'Models',slash,'SLIP_SwingLeg',slash,'Inputs;'])
 %%
-global initial_error
-initial_error = 0;
-
+global individuals
+global fitnesses
+individuals = nan(10000,4)
 A = [];
 b = [];
 Aeq = [];
@@ -67,7 +67,7 @@ beq = [];
 
 lb = [375, 0, 0, 0];
 
-ub = [390, 5, .9, .9];
+ub = [400, 5, .9, .9];
 
 % Normalized lower and upper bounds
 n_lb = zeros(size(lb));
@@ -77,8 +77,9 @@ n_ub = ones(size(ub));
 fun = @(x)cost(x, lb, ub,yCYC, zCYC, pCYC, contStateIndices);
 nonlcon = [];
 opts = gaoptimset(...
-        'PopulationSize', 100, ...
-        'Generations', 100, ...
+        'PopulationSize', 10, ...
+        'Generations', 10, ...
         'Display', 'iter', ...
-        'EliteCount', 5);
+        'EliteCount', 2);
 x = ga(fun, 4, A, b, Aeq, beq, n_lb, n_ub, nonlcon, opts);
+disp((ub-lb).*x + lb)

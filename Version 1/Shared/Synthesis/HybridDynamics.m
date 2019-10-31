@@ -83,6 +83,7 @@ function [yOUT, zOUT, tOUT, varargout] = HybridDynamics(yIN, zIN, p, SMA_L, SMA_
     global SMA_R_database
     global counter
     global active_leg
+    active_leg = SMA_R.active_leg;
     counter = 1;
 
     SMA_R_database = [];
@@ -168,7 +169,7 @@ function [yOUT, zOUT, tOUT, varargout] = HybridDynamics(yIN, zIN, p, SMA_L, SMA_
         % [t,y,teOUT,yeOUT,ieOUT] = ode_history_dependent(@(t,y) ODE(t,y,SMA_L,SMA_R),tspan,yIN,odeOPTIONS);
         % tspan = [0 5];
         % disp(active_leg)
-%           try
+           try
             
             [t,y,teOUT,yeOUT,ieOUT] = ode_history_dependent(@(t,y) ODE(t,y,SMA_L,SMA_R),outputIN.rate, tspan, yIN, @Events, @OutputFcn);
 %              disp(teOUT)
@@ -200,15 +201,15 @@ function [yOUT, zOUT, tOUT, varargout] = HybridDynamics(yIN, zIN, p, SMA_L, SMA_
 
             NoE=NoE+1;
 
-            if NoE> 24
+            if NoE> 37
                 % incorrect footfall sequences, terminate integration;
                 break;
             end
 
         
-%         catch
-%             break   
-%         end
+        catch
+            break   
+        end
     end
     if isa(outputIN, 'SLIP_Model_Graphics_AdvancedPointFeet')
         close(outputIN.video);

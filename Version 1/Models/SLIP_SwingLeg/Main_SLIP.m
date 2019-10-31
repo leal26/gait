@@ -6,7 +6,7 @@ global SMA_L_database
 global SMA_R_database
 global active_leg
 load('\\coe-fs.engr.tamu.edu\Grads\leal26\Documents\GitHub\gait\periodic_solution.mat')  
-active_leg = 'right';
+
 %% (a) Setting up working environment
 % Define a base directory to make this file easily portable to other computers:
 
@@ -60,17 +60,16 @@ addpath([GaitCreationDir,slash,'Models',slash,'SLIP_SwingLeg',slash,'Inputs;'])
 % zCYC = [1 0 1 0 0 0 0];
 % IP.duty = 1.;   
 IP.frequency = sqrt(5)/2/pi;
-IP.mean = 500;
-IP.amplitude = 0.4772;
-IP.phase = 0.0319;
+IP.mean = 396.5514    ;
+IP.amplitude = 2.9972    ;
+IP.phase = 0.6682    ;
 IP.mass = 10; % kg (used for normalizing)
 IP.gravity = 9.80665; % m/s2 (used for normalizing)
+IP.active_leg = 'right';
 SMA_density = 6450; %kg/m3
 [SMA_L, SMA_R] = define_SMA(IP, IP);
-SMA_R.phase = 0.6788;
+SMA_R.phase = 0.5295;
 %% (c) Display the solution:
-SMA_L_database = [];
-SMA_R_database = [];
 pCYC(systParamIndices.k) = NaN; % Stance leg stiffness
 
 figure(1)
@@ -87,17 +86,13 @@ plotStates = [ contStateIndices.x, contStateIndices.dx,contStateIndices.y, contS
 plot(simRES.t,simRES.continuousStates(plotStates,:))
 legend(simRES.continuousStateNames(plotStates));
 ContactForces(simRES.continuousStates(:,:),simRES.discreteStates(:,:),pCYC,simRES.t, SMA_L, SMA_R);
-% sma_plotting(simRES.t, SMA_L)
+sma_plotting(simRES.t, SMA_L)
 phase_space(simRES.continuousStates(plotStates,:))
-% disp(calculate_specific_power(SMA_R_database.sigma(1:length(simRES.t)), ...
-%                              SMA_R_database.eps(1:length(simRES.t)), ...
-%                              SMA_density, recOUTPUT.rate, 1))
+disp(calculate_specific_power(SMA_R_database.sigma(1:length(simRES.t)), ...
+                             SMA_R_database.eps(1:length(simRES.t)), ...
+                             SMA_density, recOUTPUT.rate, 1))
 
 % Show animations
-SMA_L_database = [];
-SMA_R_database = [];
-
-[SMA_L, SMA_R] = define_SMA(IP, IP); 
 graphOUTPUT = SLIP_Model_Graphics_AdvancedPointFeet(pCYC); % Must be called again with new parameters p, such that the new angle of attack is visualized
 graphOUTPUT.rate = recOUTPUT.rate;
 [yOUT, zOUT, tOUT] = HybridDynamics(yCYC, zCYC, pCYC, SMA_L, SMA_R, graphOUTPUT, simOptions);
