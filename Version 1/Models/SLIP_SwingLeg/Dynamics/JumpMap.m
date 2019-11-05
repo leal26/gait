@@ -141,7 +141,7 @@ function [yPLUS, zPLUS, isTerminal] = JumpMap(yMINUS, zMINUS, p, event)
             % Intermediate event. Simulation continues
             isTerminal = false;  
             period = yMINUS(contStateIndices.t) - right_TD;
-            disp(period)
+            % disp(period)
 
             right_TD = yMINUS(contStateIndices.t);
         case 5 % Event 5: Detect liftoff right

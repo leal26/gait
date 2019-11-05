@@ -72,10 +72,9 @@ IP.gravity = 9.80665; % m/s2 (used for normalizing)
 IP.active_leg = 'right';
 SMA_density = 6450; %kg/m3
 IP_L = IP;
-IP_L.phase = .5;
-IP_R = IP;
-IP_R.phase = 0;
+
 [SMA_L, SMA_R] = define_SMA(IP_L, IP_R);
+SMA_R.phase = 0.       ;
 
 SMA_R.F_external = .000;
 %% (c) Display the solution:

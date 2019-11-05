@@ -81,6 +81,15 @@ SMA_R = SMA;
 SMA_L.T_function = @(t) cosine_wave(t, IP_L);
 SMA_R.T_function = @(t) cosine_wave(t, IP_R);
 
+SMA_R.mean = IP_R.mean;
+SMA_L.mean = IP_L.mean;
+
+SMA_R.amplitude = IP_R.amplitude;
+SMA_L.amplitude = IP_L.amplitude;
+
+SMA_R.phase = IP_R.phase;
+SMA_L.phase = IP_L.phase;
+
 SMA_R.active_leg = IP_R.active_leg;
 SMA_L.active_leg = IP_L.active_leg;
 % T_inp = [T_0; T_final];

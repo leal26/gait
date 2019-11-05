@@ -8,15 +8,15 @@ function [t,y,teOUT,yeOUT,ieOUT] = ode_history_dependent(F_ty, h, t, y_initial, 
 global active_leg
 global SMA_R_database
 global SMA_L_database
-te_all = nan(1,100);
 tol = -1e7;
 
 y=zeros(length(y_initial),length(t));
 y(:,1)=y_initial;
 prev_teOUT = [-1 -1 -1 -1 -1 -1];
 done = false;
-te_index = 1;
+disp(t(1))
 for i=1:(length(t)-1)
+    
     % Update data for output
     OutputFcn(t(i),y(:,i),[]);
     % Calculate next value
@@ -39,9 +39,19 @@ for i=1:(length(t)-1)
         
         % Adaptive step in case there was contact
         if done
-            if ~isempty(SMA_L_database)
-                SMA_L_database.index = SMA_L_database.index - 1;
+            if ~isempty(SMA_R_database)
+                SMA_L_database.index = SMA_L_database.index - 2;
                 SMA_R_database.index = SMA_R_database.index - 1;
+
+                h_list = linspace(0,0.1,100);
+                inflections = linspace(0,0.1,100);
+                for k=1:100
+                    inflections(k) = find_event(h_list(k), F_ty, y, t, i, j, prev_teOUT, Events);
+                end
+                figure
+                plot(h_list, inflections)
+                title(t(i))
+                pause(1)
             end
 
             h_last = fzero(@(h) find_event(h, F_ty, y, t, i, j, prev_teOUT, Events),h*0.0001);
@@ -49,8 +59,7 @@ for i=1:(length(t)-1)
             t(:,i+1) = t(:,i) + h_last;
             teOUT = t(:,i) + h_last;
         end
-        te_all(te_index) = teOUT;
-        te_index = te_index + 1;
+        
         % Stop simulation if a negative stress was found
         if ~isempty(SMA_R_database)
             if (SMA_R_database.sigma(SMA_R_database.index)<tol) || (SMA_L_database.sigma(SMA_L_database.index)<tol) || y(2,i+1) < 0
@@ -66,7 +75,6 @@ for i=1:(length(t)-1)
     if done
         y = y(:,1:i+1);
         t = t(1:i+1);
-        te_all = te
         break
     end
 end

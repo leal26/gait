@@ -14,7 +14,9 @@ y=zeros(length(y_initial),length(t));
 y(:,1)=y_initial;
 prev_teOUT = [-1 -1 -1 -1 -1 -1];
 done = false;
+% disp(t(1))
 for i=1:(length(t)-1)
+    
     % Update data for output
     OutputFcn(t(i),y(:,i),[]);
     % Calculate next value
@@ -22,12 +24,12 @@ for i=1:(length(t)-1)
 
     % Determine if an event happened
     [teOUT,~,~] = Events(0,y(:,i+1));
-    inflections = sign(prev_teOUT).*sign(teOUT);
+    inflections = prev_teOUT.*teOUT;
 
     if i>1
         % Find if an event happened (it is indicated by a change in sign)
         for j=1:length(inflections)
-            if inflections(j) <= 0
+            if inflections(j) <= 1e-7
                 if i~= length(t)-1
                     done = true;
                     break
@@ -40,9 +42,19 @@ for i=1:(length(t)-1)
             if ~isempty(SMA_R_database)
                 SMA_L_database.index = SMA_L_database.index - 1;
                 SMA_R_database.index = SMA_R_database.index - 1;
+
+%                 h_list = linspace(0,0.02,100);
+%                 inflections = linspace(0,0.01,100);
+%                 for k=1:100
+%                     inflections(k) = find_event(h_list(k), F_ty, y, t, i, j, prev_teOUT, Events);
+%                 end
+%                 figure
+%                 plot(h_list, inflections)
+%                 title(t(i))
+%                 pause(1)
             end
 
-            h_last = fzero(@(h) find_event(h, F_ty, y, t, i, j, prev_teOUT, Events),h*0.0001);
+            h_last = fzero(@(h) find_event(h, F_ty, y, t, i, j, prev_teOUT, Events),h);
             y(:,i+1) = next_y(F_ty, y, t, h_last, i, true);
             t(:,i+1) = t(:,i) + h_last;
             teOUT = t(:,i) + h_last;

@@ -5,19 +5,22 @@ function output = cost(parameters, lb, ub,yCYC, zCYC, pCYC, contStateIndices, fo
     global fitnesses
     global ind_index
     global active_leg
+    global heat_switch;
+    heat_switch = nan;
     parameters = (ub-lb).*parameters + lb;
     % disp(parameters)
     IP.mean = parameters(1);
     IP.amplitude = parameters(2);
-    IP.phase = parameters(3);
-    
     IP.frequency = parameters(5);% sqrt(5)/2/pi;
     IP.mass = 10; % kg (used for normalizing)
     IP.gravity = 9.80665; % m/s2 (used for normalizing)
     IP.active_leg = 'right';
     SMA_density = 6450; %kg/m3
+    IP_L = IP;
+    IP_L.phase = parameters(3);
+    IP_R = IP;
+    IP_R.phase = parameters(4);
     [SMA_L, SMA_R] = define_SMA(IP, IP);
-    SMA_R.phase = parameters(4);
     if ~isempty(force)
         SMA_R.F_external = force;
     end
@@ -27,9 +30,9 @@ function output = cost(parameters, lb, ub,yCYC, zCYC, pCYC, contStateIndices, fo
     recOUTPUT.rate = 0.01;
     % Checking Austenite constraint
     success = true;
-    if SMA_R.T_function(0) >= SMA_R.A_f
-         try
-            [yOUT, zOUT, tOUT, recOUTPUT] = HybridDynamics(yCYC, zCYC, pCYC, SMA_L, SMA_R, recOUTPUT, simOptions);
+    if (SMA_R.T_function(0) >= SMA_R.A_f) && (SMA_L.T_function(0) >= SMA_L.A_f)
+%          try
+            [yOUT, zOUT, tOUT, te_all, recOUTPUT] = HybridDynamics(yCYC, zCYC, pCYC, SMA_L, SMA_R, recOUTPUT, simOptions);
             simRES = recOUTPUT.retrieve();
             plotStates = [ contStateIndices.x, contStateIndices.dx,contStateIndices.y, contStateIndices.dy, contStateIndices.phiL, contStateIndices.dphiL,contStateIndices.phiR, contStateIndices.dphiR];
 
@@ -47,9 +50,9 @@ function output = cost(parameters, lb, ub,yCYC, zCYC, pCYC, contStateIndices, fo
             else
                 success = false;
             end
-        catch
-            success = false;
-        end
+%         catch
+%             success = false;
+%         end
     else
         success = false;
     end
@@ -61,7 +64,7 @@ function output = cost(parameters, lb, ub,yCYC, zCYC, pCYC, contStateIndices, fo
         power_R = -9999;
     end
     
-    output = abs(21.7661-max_x);
+    output = -max_x;
     if max_x ~= -9999 && store
         individuals(ind_index,:) = parameters;
         fitnesses(ind_index,1) = max_x;

@@ -84,7 +84,7 @@ function [yOUT, zOUT, tOUT, te_all, varargout] = HybridDynamics(yIN, zIN, p, SMA
     global counter
     global active_leg
     global heat_switch
-    heat_switch = false;
+    heat_switch = nan;
     active_leg = SMA_R.active_leg;
     counter = 1;
     te_index = 1;
@@ -177,8 +177,12 @@ function [yOUT, zOUT, tOUT, te_all, varargout] = HybridDynamics(yIN, zIN, p, SMA
             [t,y,teOUT,yeOUT,ieOUT] = ode_history_dependent(@(t,y) ODE(t,y,SMA_L,SMA_R),outputIN.rate, tspan, yIN, @Events, @OutputFcn);
 %              disp(teOUT)
 %              disp(ieOUT)
-            
-            
+            disp(ieOUT == 4)
+            disp(isnan(heat_switch))
+            disp()
+            if ieOUT == 4 && isnan(heat_switch) && strcmp(active_leg,'right')
+                heat_switch = teOUT;
+            end
             if abs(t(end)-tMAX)<1e-9
                 % Time boundary is reached
                 yIN = y(end,:)';  % This will be mapped to yOUT below.

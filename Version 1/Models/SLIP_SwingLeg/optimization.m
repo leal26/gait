@@ -67,9 +67,9 @@ b = [];
 Aeq = [];
 beq = [];
 
-lb = [375, 0, 0, 0, .2];
+lb = [370, 0, 0, 0, .2];
 
-ub = [390, 5, .9, .9, 4];
+ub = [390, 10, 1, 1, 2];
 
 % Normalized lower and upper bounds
 n_lb = zeros(size(lb));
@@ -78,17 +78,24 @@ n_ub = ones(size(ub));
 individuals = nan(10000,length(lb));
 fitnesses = nan(10000,length(lb));
 
+% Set up parallelization
+if max(size(gcp)) == 0 % parallel pool needed
+    parpool(16) % create the parallel pool
+end
+
 % Define function to be optimized
 fun = @(x)cost(x, lb, ub,yCYC, zCYC, pCYC, contStateIndices, 0.0, true);
 nonlcon = [];
 opts = gaoptimset(...
         'PopulationSize', 50, ...
-        'Generations', 100, ...
+        'Generations', 10, ...
         'Display', 'iter', ...
-        'EliteCount', 2);
-figure(2)
-hold on
+        'EliteCount', 2, ...
+        'UseParallel', true, ...
+        'OutputFcn',@gaoutfun);
+tic
 x = ga(fun, length(lb), A, b, Aeq, beq, n_lb, n_ub, nonlcon, opts);
+toc
 disp((ub-lb).*x + lb)
 
 save('opt_results.mat', 'x', 'individuals', 'fitnesses', 'ind_index')

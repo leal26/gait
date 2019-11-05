@@ -172,14 +172,15 @@ function [yOUT, zOUT, tOUT, te_all, varargout] = HybridDynamics(yIN, zIN, p, SMA
         % [t,y,teOUT,yeOUT,ieOUT] = ode_history_dependent(@(t,y) ODE(t,y,SMA_L,SMA_R),tspan,yIN,odeOPTIONS);
         % tspan = [0 5];
         % disp(active_leg)
-%            try
+           try
             
             [t,y,teOUT,yeOUT,ieOUT] = ode_history_dependent(@(t,y) ODE(t,y,SMA_L,SMA_R),outputIN.rate, tspan, yIN, @Events, @OutputFcn);
 %              disp(teOUT)
 %              disp(ieOUT)
-            
-            if ieOUT == 4 && isnan(heat_switch) && strcmp(active_leg,'right')
-                heat_switch = teOUT;
+            if ~isempty(ieOUT)
+                if ieOUT == 4 && isnan(heat_switch) && strcmp(active_leg,'right')
+                    heat_switch = teOUT;
+                end
             end
             if abs(t(end)-tMAX)<1e-9
                 % Time boundary is reached
@@ -216,9 +217,9 @@ function [yOUT, zOUT, tOUT, te_all, varargout] = HybridDynamics(yIN, zIN, p, SMA
             end
 
         
-%         catch
-%             break   
-%         end
+        catch
+            break   
+        end
     end
     if isa(outputIN, 'SLIP_Model_Graphics_AdvancedPointFeet')
         close(outputIN.video);
