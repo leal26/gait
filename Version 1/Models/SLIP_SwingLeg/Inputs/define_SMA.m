@@ -72,6 +72,7 @@ SMA.E_0 = inv(inv(SMA.E_A)+SMA.MVF_init*(inv(SMA.E_M)-inv(SMA.E_A)));
 SMA.n = false;
 SMA.to_plot = false;
 
+SMA.F_external = 0;
 % Define SMA components
 SMA_L = SMA;
 SMA_R = SMA;
@@ -89,6 +90,6 @@ SMA_L.active_leg = IP_L.active_leg;
     % else     
         % T = [T; linspace(T_inp(i), T_inp(i+1),n)'];
     % end
-        
+  
 end
 

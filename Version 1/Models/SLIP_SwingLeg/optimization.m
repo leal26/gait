@@ -59,27 +59,36 @@ addpath([GaitCreationDir,slash,'Models',slash,'SLIP_SwingLeg',slash,'Inputs;'])
 %%
 global individuals
 global fitnesses
-individuals = nan(10000,4)
+global ind_index
+ind_index = 1;
+
 A = [];
 b = [];
 Aeq = [];
 beq = [];
 
-lb = [375, 0, 0, 0];
+lb = [375, 0, 0, 0, .2];
 
-ub = [400, 5, .9, .9];
+ub = [390, 5, .9, .9, 4];
 
 % Normalized lower and upper bounds
 n_lb = zeros(size(lb));
 n_ub = ones(size(ub));
 
+individuals = nan(10000,length(lb));
+fitnesses = nan(10000,length(lb));
+
 % Define function to be optimized
-fun = @(x)cost(x, lb, ub,yCYC, zCYC, pCYC, contStateIndices);
+fun = @(x)cost(x, lb, ub,yCYC, zCYC, pCYC, contStateIndices, 0.0, true);
 nonlcon = [];
 opts = gaoptimset(...
-        'PopulationSize', 10, ...
-        'Generations', 10, ...
+        'PopulationSize', 50, ...
+        'Generations', 100, ...
         'Display', 'iter', ...
         'EliteCount', 2);
-x = ga(fun, 4, A, b, Aeq, beq, n_lb, n_ub, nonlcon, opts);
+figure(2)
+hold on
+x = ga(fun, length(lb), A, b, Aeq, beq, n_lb, n_ub, nonlcon, opts);
 disp((ub-lb).*x + lb)
+
+save('opt_results.mat', 'x', 'individuals', 'fitnesses', 'ind_index')

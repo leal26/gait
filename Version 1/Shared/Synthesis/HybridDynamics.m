@@ -78,16 +78,19 @@
 %   See also FLOWMAP, JUMPMAP, JUMPSET, OUTPUTCLASS.
 %
 
-function [yOUT, zOUT, tOUT, varargout] = HybridDynamics(yIN, zIN, p, SMA_L, SMA_R, varargin)
+function [yOUT, zOUT, tOUT, te_all, varargout] = HybridDynamics(yIN, zIN, p, SMA_L, SMA_R, varargin)
     global SMA_L_database
     global SMA_R_database
     global counter
     global active_leg
+    global heat_switch
+    heat_switch = nan;
     active_leg = SMA_R.active_leg;
     counter = 1;
-
+    te_index = 1;
     SMA_R_database = [];
     SMA_L_database = [];
+    te_all = nan(1,100);
     % *********************************************************************
     % INPUT HANDLING
     %   Check the number of parameters:
@@ -169,11 +172,15 @@ function [yOUT, zOUT, tOUT, varargout] = HybridDynamics(yIN, zIN, p, SMA_L, SMA_
         % [t,y,teOUT,yeOUT,ieOUT] = ode_history_dependent(@(t,y) ODE(t,y,SMA_L,SMA_R),tspan,yIN,odeOPTIONS);
         % tspan = [0 5];
         % disp(active_leg)
-           try
+%            try
             
             [t,y,teOUT,yeOUT,ieOUT] = ode_history_dependent(@(t,y) ODE(t,y,SMA_L,SMA_R),outputIN.rate, tspan, yIN, @Events, @OutputFcn);
 %              disp(teOUT)
 %              disp(ieOUT)
+            
+            if ieOUT == 4 && isnan(heat_switch) && strcmp(active_leg,'right')
+                heat_switch = teOUT;
+            end
             if abs(t(end)-tMAX)<1e-9
                 % Time boundary is reached
                 yIN = y(end,:)';  % This will be mapped to yOUT below.
@@ -190,6 +197,8 @@ function [yOUT, zOUT, tOUT, varargout] = HybridDynamics(yIN, zIN, p, SMA_L, SMA_
                 tIN = -1;
                 break;    
             else
+                te_all(te_index) = teOUT;
+                te_index = te_index + 1;
                 % Handle the discrete change of states at events by calling the
                 % jump map (which must be on the MATLAB search path): 
 
@@ -207,9 +216,9 @@ function [yOUT, zOUT, tOUT, varargout] = HybridDynamics(yIN, zIN, p, SMA_L, SMA_
             end
 
         
-        catch
-            break   
-        end
+%         catch
+%             break   
+%         end
     end
     if isa(outputIN, 'SLIP_Model_Graphics_AdvancedPointFeet')
         close(outputIN.video);
@@ -218,7 +227,7 @@ function [yOUT, zOUT, tOUT, varargout] = HybridDynamics(yIN, zIN, p, SMA_L, SMA_
     yOUT = yIN;
     zOUT = zIN;
     tOUT = tIN;
-    if nargout == 4
+    if nargout == 5
         varargout(1) = {outputIN};
     else
         varargout = {};

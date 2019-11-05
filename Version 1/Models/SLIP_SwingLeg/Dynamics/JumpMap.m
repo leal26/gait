@@ -52,6 +52,8 @@ function [yPLUS, zPLUS, isTerminal] = JumpMap(yMINUS, zMINUS, p, event)
     % We keep the index-structs in memory to speed up processing
     persistent contStateIndices  systParamIndices discStateIndices
     global active_leg
+    global period
+    global right_TD
     if isempty(contStateIndices)  || isempty(systParamIndices) || isempty(discStateIndices)
         [~, ~, contStateIndices] = ContStateDefinition();
         [~, ~, systParamIndices] = SystParamDefinition();
@@ -138,7 +140,10 @@ function [yPLUS, zPLUS, isTerminal] = JumpMap(yMINUS, zMINUS, p, event)
             yPLUS(contStateIndices.dphiR)   = -yMINUS(contStateIndices.dx)*cos(yPLUS(contStateIndices.phiR) + alpha) - yMINUS(contStateIndices.dy)*sin(yPLUS(contStateIndices.phiR) + alpha);
             % Intermediate event. Simulation continues
             isTerminal = false;  
-            
+            period = yMINUS(contStateIndices.t) - right_TD;
+            disp(period)
+
+            right_TD = yMINUS(contStateIndices.t);
         case 5 % Event 5: Detect liftoff right
             zPLUS(discStateIndices.rphase)  = 1;
             % Reset right leg angular velocity at liftoff to stance velocity

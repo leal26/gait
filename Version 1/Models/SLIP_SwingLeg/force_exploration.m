@@ -4,18 +4,17 @@ clc
 
 global SMA_L_database
 global SMA_R_database
-global active_leg
-global period
-global right_TD
-global heat_switch
+
 load('\\coe-fs.engr.tamu.edu\Grads\leal26\Documents\GitHub\gait\periodic_solution.mat')  
+plotStates = [ contStateIndices.x, contStateIndices.dx,contStateIndices.y, contStateIndices.dy, contStateIndices.phiL, contStateIndices.dphiL,contStateIndices.phiR, contStateIndices.dphiR];
+y_periodic = simRES.continuousStates(plotStates,:);
 
 %% (a) Setting up working environment
 % Define a base directory to make this file easily portable to other computers:
 
 % ************************************
 GaitCreationDir = which(mfilename);
-GaitCreationDir = erase(GaitCreationDir, [filesep,'Models',filesep,'SLIP_SwingLeg',filesep,'Main_SLIP.m']);
+GaitCreationDir = erase(GaitCreationDir, [filesep,'Models',filesep,'SLIP_SwingLeg',filesep,'force_exploration.m']);
 % ************************************
 % ************************************
 if ~exist(GaitCreationDir,'dir')
@@ -57,53 +56,34 @@ path(path,[GaitCreationDir,slash,'Models',slash,'SLIP_SwingLeg;',...
 addpath([GaitCreationDir,slash,'Models',slash,'SLIP_SwingLeg',slash,'SMA_temperature_strain_driven;'])
 addpath([GaitCreationDir,slash,'Models',slash,'SLIP_SwingLeg',slash,'phase_diagram;'])
 addpath([GaitCreationDir,slash,'Models',slash,'SLIP_SwingLeg',slash,'Inputs;'])
+%%
+global individuals
+global fitnesses
+global ind_index
+ind_index = 1;
+individuals = nan(10000,4);
+fitnesses = nan(10000,4);
 
-% x dx y dy alpha dalpha phiL dphiL phiR dphiR t
-% yCYC = [0.0000 2.0119 0.9553 0.0000 0.0000 0.0000 0.8620 0.0339 -0.8620 0.0339 0];
-% zCYC = [1 0 1 0 0 0 0];
-% IP.duty = 1.;   
-period = 2.7419 ;
-right_TD = 0;
-IP.frequency = 1/2.7419 ;
-IP.mean =    38800.6913       ;
-IP.amplitude = 4.8789          ;
-IP.phase = 0.             ;
-IP.mass = 10; % kg (used for normalizing)
-IP.gravity = 9.80665; % m/s2 (used for normalizing)
-IP.active_leg = 'right';
-SMA_density = 6450; %kg/m3
-[SMA_L, SMA_R] = define_SMA(IP, IP);
-SMA_R.phase = 0.5       ;
-SMA_R.F_external = .000;
-%% (c) Display the solution:
-pCYC(systParamIndices.k) = NaN; % Stance leg stiffness
+lb = [375, 0, 0, 0];
 
-figure(1)
-simOptions.tMAX = 20; 
-recOUTPUT = RecordStateCLASS();
-recOUTPUT.rate = 0.01;
-% figure
-% hold on
+ub = [400, 5, .9, .9];
 
-[yOUT, zOUT, tOUT, te_all, recOUTPUT] = HybridDynamics(yCYC, zCYC, pCYC, SMA_L, SMA_R, recOUTPUT, simOptions);
+n = 100;
+spacing = linspace(-9,0,n);
+force = 10.^spacing;
+distance = zeros(1,n);
+x = [3, 0, 0, 0]; % SHould make it pseudoelastic
+for i=1:n
+    disp(i)
+    distance(i) = cost(x, lb, ub,yCYC, zCYC, pCYC, contStateIndices, force(i), false);
+    if distance(i) == 9999
+        distance(i) = NaN;
+    end
+end
 
-simRES = recOUTPUT.retrieve();
-% Define which states are plotted:
-plotStates = [ contStateIndices.x, contStateIndices.dx,contStateIndices.y, contStateIndices.dy, contStateIndices.phiL, contStateIndices.dphiL,contStateIndices.phiR, contStateIndices.dphiR];
-plot(simRES.t,simRES.continuousStates(plotStates,:))
-legend(simRES.continuousStateNames(plotStates));
-ContactForces(simRES.continuousStates(:,:),simRES.discreteStates(:,:),pCYC,simRES.t, SMA_L, SMA_R);
-sma_plotting(simRES.t, SMA_L, te_all)
-phase_space(simRES.continuousStates(plotStates,:))
-disp(calculate_specific_power(SMA_R_database.sigma(1:length(simRES.t)), ...
-                             SMA_R_database.eps(1:length(simRES.t)), ...
-                             SMA_density, recOUTPUT.rate, 1))
-BREAK
-% Show animations
-graphOUTPUT = SLIP_Model_Graphics_AdvancedPointFeet(pCYC); % Must be called again with new parameters p, such that the new angle of attack is visualized
-graphOUTPUT.rate = recOUTPUT.rate;
-[yOUT, zOUT, tOUT, te_all] = HybridDynamics(yCYC, zCYC, pCYC, SMA_L, SMA_R, graphOUTPUT, simOptions);
-
-% recOUTPUT = RecordStateCLASS();
-% [yOUT, zOUT, tOUT, recOUTPUT] = HybridDynamics(yCYC, zCYC, pCYC, SMA_L, SMA_R,recOUTPUT, simOptions);
-% simRES = recOUTPUT.retrieve();
+figure(2)
+plot(spacing, -distance)
+xticks(linspace(-9,0,10))
+xticklabels({'10^{-9}', '10^{-8}', '10^{-7}', '10^{-6}', '10^{-5}', '10^{-4}', '10^{-3}','10^{-2}', '10^{-1}', '10^{0}'})
+xlabel('External force')
+ylabel('Maximum distance')

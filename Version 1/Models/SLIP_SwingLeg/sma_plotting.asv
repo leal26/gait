@@ -28,7 +28,8 @@ for i=1:length(te_all)
     end
 end
 plot(T,SMA_L_database.T(1:length(T)),'LineWidth',2,'color',color_l)
-
+te
+heat_switch = nan;
 plot(T,P.T_function(T),'LineWidth',2,'color','y')
 plot(T,P.T_function(T),'LineWidth',2,'color','y')
 plot(T,SMA_R_database.T(1:length(T)),'LineWidth',2,'color',color_r)

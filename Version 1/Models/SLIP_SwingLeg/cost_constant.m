@@ -61,7 +61,7 @@ function output = cost(parameters, lb, ub,yCYC, zCYC, pCYC, contStateIndices, fo
         power_R = -9999;
     end
     
-    output = -max_x;
+    output = abs(21.7661-max_x);
     if max_x ~= -9999 && store
         individuals(ind_index,:) = parameters;
         fitnesses(ind_index,1) = max_x;

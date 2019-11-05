@@ -37,7 +37,7 @@ for i=1:(length(t)-1)
         
         % Adaptive step in case there was contact
         if done
-            if ~isempty(SMA_L_database)
+            if ~isempty(SMA_R_database)
                 SMA_L_database.index = SMA_L_database.index - 1;
                 SMA_R_database.index = SMA_R_database.index - 1;
             end

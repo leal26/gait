@@ -127,7 +127,7 @@ function dydt = FlowMap(t, y, z, p, SMA_L, SMA_R, varargin)
         store(SMA_L, SMA_R)
 %         scatter(t,Fr,'k')
     end
-    Fx=-Fl*sin(phi_L+alpha)-Fr*sin(phi_R+alpha);
+    Fx=-Fl*sin(phi_L+alpha)-Fr*sin(phi_R+alpha)-SMA_R.F_external;
     Fy= Fl*cos(phi_L+alpha)+Fr*cos(phi_R+alpha);
     
     % Compute the derivative of all states according to the phase:
