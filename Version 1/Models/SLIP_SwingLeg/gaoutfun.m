@@ -1,4 +1,4 @@
-function [state, options,optchanged] = gaoutputfun(options,state,flag)
+function [state, options,optchanged] = gaoutputfun(options,state,flag, filename)
 optchanged = false;
 switch flag
     case 'init'

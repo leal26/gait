@@ -172,7 +172,7 @@ function [yOUT, zOUT, tOUT, te_all, varargout] = HybridDynamics(yIN, zIN, p, SMA
         % [t,y,teOUT,yeOUT,ieOUT] = ode_history_dependent(@(t,y) ODE(t,y,SMA_L,SMA_R),tspan,yIN,odeOPTIONS);
         % tspan = [0 5];
         % disp(active_leg)
-           try
+        try
             
             [t,y,teOUT,yeOUT,ieOUT] = ode_history_dependent(@(t,y) ODE(t,y,SMA_L,SMA_R),outputIN.rate, tspan, yIN, @Events, @OutputFcn);
 %              disp(teOUT)

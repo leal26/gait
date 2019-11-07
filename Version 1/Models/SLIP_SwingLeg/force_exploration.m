@@ -64,15 +64,15 @@ ind_index = 1;
 individuals = nan(10000,4);
 fitnesses = nan(10000,4);
 
-lb = [375, 0, 0, 0];
+lb = [370, 0, 0, 0, .2];
 
-ub = [400, 5, .9, .9];
+ub = [390, 10, 1, 1, 2];
 
-n = 100;
-spacing = linspace(-9,0,n);
-force = 10.^spacing;
+n = 101;
+spacing = linspace(-9,0,51);
+force = [-10.^flip(spacing), 10.^spacing(2:51)];
 distance = zeros(1,n);
-x = [3, 0, 0, 0]; % SHould make it pseudoelastic
+x = [3, 0, 0, 0,0]; % SHould make it pseudoelastic
 for i=1:n
     disp(i)
     distance(i) = cost(x, lb, ub,yCYC, zCYC, pCYC, contStateIndices, force(i), false);
@@ -82,8 +82,8 @@ for i=1:n
 end
 
 figure(2)
-plot(spacing, -distance)
-xticks(linspace(-9,0,10))
-xticklabels({'10^{-9}', '10^{-8}', '10^{-7}', '10^{-6}', '10^{-5}', '10^{-4}', '10^{-3}','10^{-2}', '10^{-1}', '10^{0}'})
+plot(linspace(0,100,length(force)), -distance)
+xticks(linspace(0,100,10))
+xticklabels({'-10^{-1}', '-10^{-3}', '-10^{-5}', '-10^{-7}', '-10^{-9}', '10^{-9}', '10^{-7}','10^{-5}', '10^{-3}', '10^{-1}'})
 xlabel('External force')
 ylabel('Maximum distance')
