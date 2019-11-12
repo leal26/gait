@@ -59,10 +59,10 @@ for i=1:(length(t)-1)
             t(:,i+1) = t(:,i) + h_last;
             teOUT = t(:,i) + h_last;
         end
-        
+
         % Stop simulation if a negative stress was found
         if ~isempty(SMA_R_database)
-            if (SMA_R_database.sigma(SMA_R_database.index)<tol) || (SMA_L_database.sigma(SMA_L_database.index)<tol) || y(2,i+1) < 0
+            if (SMA_R_database.sigma(SMA_R_database.index)<tol) || (SMA_L_database.sigma(SMA_L_database.index)<tol) || y(3,i+1) < 0 || (SMA_R_database.eps_t(SMA_R_database.index)>-tol) || (SMA_L_database.eps_t(SMA_L_database.index)>-tol)
     %             disp(SMA_R_database.sigma(SMA_R_database.index))
     %             disp(SMA_L_database.sigma(SMA_L_database.index))
                 done = true;

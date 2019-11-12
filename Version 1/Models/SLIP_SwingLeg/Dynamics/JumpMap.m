@@ -54,6 +54,11 @@ function [yPLUS, zPLUS, isTerminal] = JumpMap(yMINUS, zMINUS, p, event)
     global active_leg
     global period
     global right_TD
+    global prev_Y_R
+    global prev_right_TD
+    global current_Y_R
+    global prev_Y_L
+    global current_Y_L
     if isempty(contStateIndices)  || isempty(systParamIndices) || isempty(discStateIndices)
         [~, ~, contStateIndices] = ContStateDefinition();
         [~, ~, systParamIndices] = SystParamDefinition();
@@ -112,7 +117,8 @@ function [yPLUS, zPLUS, isTerminal] = JumpMap(yMINUS, zMINUS, p, event)
             % Intermediate event. Simulation continues    
             %%%%%%%%%%%%%% For symmertical gaits
             isTerminal = false;  
-                
+            prev_Y_L = current_Y_L;
+            current_Y_L = yMINUS(2:end-1);     
 
         case 2 % Event 2: Detect liftoff left
             zPLUS(discStateIndices.lphase)  = 1;
@@ -141,9 +147,17 @@ function [yPLUS, zPLUS, isTerminal] = JumpMap(yMINUS, zMINUS, p, event)
             % Intermediate event. Simulation continues
             isTerminal = false;  
             period = yMINUS(contStateIndices.t) - right_TD;
-            % disp(period)
-
+%             disp('here')
+%             disp(period)
+            prev_right_TD = right_TD;
             right_TD = yMINUS(contStateIndices.t);
+            prev_Y_R = current_Y_R;
+            current_Y_R = yMINUS(2:end-1);
+            disp('right_TD')
+            disp(right_TD)
+%             disp('current_Y_R')
+%             disp(current_Y_R)
+            
         case 5 % Event 5: Detect liftoff right
             zPLUS(discStateIndices.rphase)  = 1;
             % Reset right leg angular velocity at liftoff to stance velocity

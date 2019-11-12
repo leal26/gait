@@ -62,9 +62,9 @@ addpath([GaitCreationDir,slash,'Models',slash,'SLIP_SwingLeg',slash,'Inputs;'])
 % yCYC = [0.0000 2.0119 0.9553 0.0000 0.0000 0.0000 0.8620 0.0339 -0.8620 0.0339 0];
 % zCYC = [1 0 1 0 0 0 0];
 % IP.duty = 1.;   
-
-parameters = [389.7520    2.5119    0.2626    0.7368    0.3740];
-force = -0.01;
+% 3.909668726968498   0.033978956427332   0.002877539998629   0.004320773548430   0.017146826972944
+parameters = [387.6645163865866   005.2512256277763   000.4834709038690   000.2332068073740   005.3128729393923];
+force = -0.001;
 
 period = 2.7419 ;
 right_TD = 0;
@@ -84,6 +84,8 @@ IP_R.phase = parameters(4);
 SMA_R.F_external = force;
 %% (c) Display the solution:
 pCYC(systParamIndices.k) = NaN; % Stance leg stiffness
+% yCYC = [0, 1.470855049737456, 0.905287254011324, -0.3840203919504400, 0, 0, -0.452839111566140, 1.141202845250059, 0.438740881829678, -1.168414654087005, 0];
+% zCYC = [1.000000000000000, 6.362629437198447, 2.000000000000000, 8.341906161353137, 0, 0, 0];
 
 figure(1)
 simOptions.tMAX = 20; 
@@ -92,8 +94,9 @@ recOUTPUT.rate = 0.01;
 % figure
 % hold on
 tic
-[yOUT, zOUT, tOUT, te_all, recOUTPUT] = HybridDynamics(yCYC, zCYC, pCYC, SMA_L, SMA_R, recOUTPUT, simOptions);
+[yOUT, zOUT, tOUT, te_all, periodicity, recOUTPUT] = HybridDynamics(yCYC, zCYC, pCYC, SMA_L, SMA_R, recOUTPUT, simOptions);
 toc
+fprintf('Periodicity %f\n', periodicity)
 simRES = recOUTPUT.retrieve();
 % Define which states are plotted:
 plotStates = [ contStateIndices.x, contStateIndices.dx,contStateIndices.y, contStateIndices.dy, contStateIndices.phiL, contStateIndices.dphiL,contStateIndices.phiR, contStateIndices.dphiR];
@@ -107,9 +110,9 @@ disp(calculate_specific_power(SMA_R_database.sigma(1:length(simRES.t)), ...
                              SMA_density, recOUTPUT.rate, 1))
 
 % Show animations
-graphOUTPUT = SLIP_Model_Graphics_AdvancedPointFeet(pCYC); % Must be called again with new parameters p, such that the new angle of attack is visualized
-graphOUTPUT.rate = 0.01;
-[yOUT, zOUT, tOUT, te_all] = HybridDynamics(yCYC, zCYC, pCYC, SMA_L, SMA_R, graphOUTPUT, simOptions);
+% graphOUTPUT = SLIP_Model_Graphics_AdvancedPointFeet(pCYC); % Must be called again with new parameters p, such that the new angle of attack is visualized
+% graphOUTPUT.rate = 0.01;
+% [yOUT, zOUT, tOUT, te_all, periodicity] = HybridDynamics(yCYC, zCYC, pCYC, SMA_L, SMA_R, graphOUTPUT, simOptions);
 
 % recOUTPUT = RecordStateCLASS();
 % [yOUT, zOUT, tOUT, recOUTPUT] = HybridDynamics(yCYC, zCYC, pCYC, SMA_L, SMA_R,recOUTPUT, simOptions);

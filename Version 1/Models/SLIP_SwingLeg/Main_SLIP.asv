@@ -62,45 +62,39 @@ addpath([GaitCreationDir,slash,'Models',slash,'SLIP_SwingLeg',slash,'Inputs;'])
 % yCYC = [0.0000 2.0119 0.9553 0.0000 0.0000 0.0000 0.8620 0.0339 -0.8620 0.0339 0];
 % zCYC = [1 0 1 0 0 0 0];
 % IP.duty = 1.;   
-    IP.mean = parameters(1);
-    IP.amplitude = parameters(2);
-    IP.frequency = parameters(5);% sqrt(5)/2/pi;
-    IP.mass = 10; % kg (used for normalizing)
-    IP.gravity = 9.80665; % m/s2 (used for normalizing)
-    IP.active_leg = 'right';
-    SMA_density = 6450; %kg/m3
-    IP_L = IP;
-    IP_L.phase = parameters(3);
-    IP_R = IP;
-    IP_R.phase = parameters(4);
-parameters = [389.6348    3.7576    0.7805    0.6255    0.7171]
+
+parameters = [389.9999938390179   000.6090160021901   000.0711137715372   000.4900644835546   001.5605062541611];
+force = -0.001;
+
 period = 2.7419 ;
 right_TD = 0;
-IP.frequency =  parameters(1);
-IP.mean =    38800.6913       ;
-IP.amplitude = 4.8789          ;
+IP.frequency =  parameters(5);
+IP.mean =    parameters(1)       ;
+IP.amplitude = parameters(2)         ;
 IP.mass = 10; % kg (used for normalizing)
 IP.gravity = 9.80665; % m/s2 (used for normalizing)
 IP.active_leg = 'right';
 SMA_density = 6450; %kg/m3
 IP_L = IP;
-IP_L.phase = .5;
+IP_L.phase = parameters(3);
 IP_R = IP;
-IP_R.phase = 0;
+IP_R.phase = parameters(4);
 [SMA_L, SMA_R] = define_SMA(IP_L, IP_R);
 
-SMA_R.F_external = .01;
+SMA_R.F_external = force;
 %% (c) Display the solution:
 pCYC(systParamIndices.k) = NaN; % Stance leg stiffness
+% yCYC = [0, 1.470855049737456, 0.905287254011324, -0.3840203919504400, 0, 0, -0.452839111566140, 1.141202845250059, 0.438740881829678, -1.168414654087005, 0];
+% zCYC = [1.000000000000000, 6.362629437198447, 2.000000000000000, 8.341906161353137, 0, 0, 0];
 
 figure(1)
 simOptions.tMAX = 20; 
 recOUTPUT = RecordStateCLASS();
-recOUTPUT.rate = 0.001;
+recOUTPUT.rate = 0.01;
 % figure
 % hold on
 tic
-[yOUT, zOUT, tOUT, te_all, recOUTPUT] = HybridDynamics(yCYC, zCYC, pCYC, SMA_L, SMA_R, recOUTPUT, simOptions);
+[yOUT, zOUT, tOUT, te_all, periodicity, recOUTPUT] = HybridDynamics(yCYC, zCYC, pCYC, SMA_L, SMA_R, recOUTPUT, simOptions);
 toc
 simRES = recOUTPUT.retrieve();
 % Define which states are plotted:
@@ -113,11 +107,11 @@ phase_space(simRES.continuousStates(plotStates,:))
 disp(calculate_specific_power(SMA_R_database.sigma(1:length(simRES.t)), ...
                              SMA_R_database.eps(1:length(simRES.t)), ...
                              SMA_density, recOUTPUT.rate, 1))
-BREAK
+
 % Show animations
 graphOUTPUT = SLIP_Model_Graphics_AdvancedPointFeet(pCYC); % Must be called again with new parameters p, such that the new angle of attack is visualized
-graphOUTPUT.rate = recOUTPUT.rate;
-[yOUT, zOUT, tOUT, te_all] = HybridDynamics(yCYC, zCYC, pCYC, SMA_L, SMA_R, graphOUTPUT, simOptions);
+graphOUTPUT.rate = 0.01;
+[yOUT, zOUT, tOUT, te_all, periodicity] = HybridDynamics(yCYC, zCYC, pCYC, SMA_L, SMA_R, graphOUTPUT, simOptions);
 
 % recOUTPUT = RecordStateCLASS();
 % [yOUT, zOUT, tOUT, recOUTPUT] = HybridDynamics(yCYC, zCYC, pCYC, SMA_L, SMA_R,recOUTPUT, simOptions);

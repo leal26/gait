@@ -78,18 +78,30 @@
 %   See also FLOWMAP, JUMPMAP, JUMPSET, OUTPUTCLASS.
 %
 
-function [yOUT, zOUT, tOUT, te_all, varargout] = HybridDynamics(yIN, zIN, p, SMA_L, SMA_R, varargin)
+function [yOUT, zOUT, tOUT, te_all, periodicity, varargout] = HybridDynamics(yIN, zIN, p, SMA_L, SMA_R, varargin)
     global SMA_L_database
     global SMA_R_database
     global counter
     global active_leg
     global heat_switch
-    heat_switch = nan;
+    global current_Y_R
+    global current_Y_L
+    global prev_Y_R
+    global prev_Y_L
+    global right_TD
+    global prev_right_TD
+    heat_switch = true;
     active_leg = SMA_R.active_leg;
     counter = 1;
     te_index = 1;
     SMA_R_database = [];
     SMA_L_database = [];
+    prev_Y_R = 0;
+    prev_Y_L = 0;
+    current_Y_R = transpose(yIN(2:end-1));
+    current_Y_L = ones(size(yIN(2:end-1)));
+    right_TD = 0;
+    prev_right_TD = 9999;
     te_all = nan(1,100);
     % *********************************************************************
     % INPUT HANDLING
@@ -172,14 +184,14 @@ function [yOUT, zOUT, tOUT, te_all, varargout] = HybridDynamics(yIN, zIN, p, SMA
         % [t,y,teOUT,yeOUT,ieOUT] = ode_history_dependent(@(t,y) ODE(t,y,SMA_L,SMA_R),tspan,yIN,odeOPTIONS);
         % tspan = [0 5];
         % disp(active_leg)
-        try
+         try
             
             [t,y,teOUT,yeOUT,ieOUT] = ode_history_dependent(@(t,y) ODE(t,y,SMA_L,SMA_R),outputIN.rate, tspan, yIN, @Events, @OutputFcn);
 %              disp(teOUT)
 %              disp(ieOUT)
             if ~isempty(ieOUT)
-                if ieOUT == 4 && isnan(heat_switch) && strcmp(active_leg,'right')
-                    heat_switch = teOUT;
+                if ieOUT == 4 && heat_switch && strcmp(active_leg,'right')
+                    heat_switch = false;
                 end
             end
             if abs(t(end)-tMAX)<1e-9
@@ -189,13 +201,18 @@ function [yOUT, zOUT, tOUT, te_all, varargout] = HybridDynamics(yIN, zIN, p, SMA
                 warning('The integration stops at the time boundary.');
                 break;  
             end    
- 
-            if isempty(ieOUT)
+
+            if isempty(ieOUT) || (abs(prev_right_TD - right_TD) < 1e-4)
                 % No event occurred. The simulation ran out of time without
                 % reaching the terminating event. Map final continuous states
                 % (discrete states were not altered) and set time to -1:
                 yIN = y(end,:)';  % This will be mapped to yOUT below.
                 tIN = -1;
+                try
+                    periodicity = periodicity*10;
+                catch
+                    periodicity = 9999;
+                end
                 break;    
             else
                 te_all(te_index) = teOUT;
@@ -211,12 +228,17 @@ function [yOUT, zOUT, tOUT, te_all, varargout] = HybridDynamics(yIN, zIN, p, SMA
 
             NoE=NoE+1;
 
-            if NoE> 37
+            if NoE> 64
                 % incorrect footfall sequences, terminate integration;
                 break;
             end
 
-        
+            periodicity_R = norm(current_Y_R-prev_Y_R);
+            % periodicity_L = norm(current_Y_L-prev_Y_L);
+            periodicity = periodicity_R;
+            if periodicity < 1e-3
+                break
+            end
         catch
             break   
         end
@@ -228,7 +250,7 @@ function [yOUT, zOUT, tOUT, te_all, varargout] = HybridDynamics(yIN, zIN, p, SMA
     yOUT = yIN;
     zOUT = zIN;
     tOUT = tIN;
-    if nargout == 5
+    if nargout == 6
         varargout(1) = {outputIN};
     else
         varargout = {};

@@ -25,14 +25,14 @@ function output = cost(parameters_nd, lb, ub,yCYC, zCYC, pCYC, contStateIndices,
         SMA_R.F_external = force;
     end
     simOptions.tIN = 0; 
-    simOptions.tMAX = 40; 
+    simOptions.tMAX = 50; 
     recOUTPUT = RecordStateCLASS();
     recOUTPUT.rate = 0.01;
     % Checking Austenite constraint
     success = true;
     if (SMA_R.mean + SMA_R.amplitude*cos(2*pi*SMA_R.phase) >= SMA_R.A_f) && (SMA_L.mean + SMA_L.amplitude*cos(2*pi*(SMA_L.phase + .5)) >= SMA_L.A_f)
           try
-            [yOUT, zOUT, tOUT, te_all, recOUTPUT] = HybridDynamics(yCYC, zCYC, pCYC, SMA_L, SMA_R, recOUTPUT, simOptions);
+            [yOUT, zOUT, tOUT, te_all, periodicity, recOUTPUT] = HybridDynamics(yCYC, zCYC, pCYC, SMA_L, SMA_R, recOUTPUT, simOptions);
             simRES = recOUTPUT.retrieve();
             plotStates = [ contStateIndices.x, contStateIndices.dx,contStateIndices.y, contStateIndices.dy, contStateIndices.phiL, contStateIndices.dphiL,contStateIndices.phiR, contStateIndices.dphiR];
 
@@ -62,9 +62,16 @@ function output = cost(parameters_nd, lb, ub,yCYC, zCYC, pCYC, contStateIndices,
         av_dy = -9999;
         power_L = -9999;
         power_R = -9999;
+        periodicity = 9999;
     end
-    
-    output = -max_x;
+
+    output = 9999;
+    if success
+        if max(simRES.t) > 10
+
+            output = periodicity;
+        end
+    end
     if max_x ~= -9999 && store
 %         size(parameters)
 %         size(individuals(ind_index,:))
@@ -78,9 +85,11 @@ function output = cost(parameters_nd, lb, ub,yCYC, zCYC, pCYC, contStateIndices,
 %         ind_index = ind_index + 1;
         color_l = [127/256,127/256,127/256];
         color_r = [0/256,45/256,98/256];
-        figure(1)
+        figure(10)
         hold on
-        scatter(power_L, max_x,[],color_l,'filled')
-        scatter(power_R, max_x,[],color_r,'filled')
+        if periodicity ~= 9999
+            scatter(power_L, periodicity,[],color_l,'filled')
+            scatter(power_R, periodicity,[],color_r,'filled')
+        end
         shg
     end

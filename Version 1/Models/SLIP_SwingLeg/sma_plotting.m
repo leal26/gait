@@ -2,8 +2,8 @@ function [] = sma_plotting(T, SMA_L, SMA_R, te_all)
 global SMA_L_database
 global SMA_R_database
 global heat_switch
-color_l = [127/256,127/256,127/256];
-color_r = [0/256,45/256,98/256];
+color_r = [127/256,127/256,127/256];
+color_l = [0/256,45/256,98/256];
 
 %%
 figure
