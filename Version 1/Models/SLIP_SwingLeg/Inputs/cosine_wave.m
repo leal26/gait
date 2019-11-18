@@ -6,10 +6,11 @@ frequency = IP.frequency;
 amplitude = IP.amplitude;
 phase = IP.phase;
 
-% if heat_switch
-%     output = IP.mean + amplitude;
-% else
-%    output = IP.mean + amplitude*cos(2*pi*frequency*(t) + 2*pi*phase);
-% end
-output = IP.mean + amplitude*cos(2*pi*frequency*(t) + 2*pi*phase);
+if heat_switch
+    output = IP.mean + amplitude*cos(2*pi*frequency*(t) + 2*pi*phase);
+    
+else
+   output = IP.mean + amplitude;
+end
+% output = IP.mean + amplitude*cos(2*pi*frequency*(t) + 2*pi*phase);
 end

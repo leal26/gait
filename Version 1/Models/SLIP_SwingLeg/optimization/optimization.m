@@ -69,7 +69,7 @@ beq = [];
 
 lb = [370, 0, 0, 0, .2];
 
-ub = [400, 10, 1, 1, 6];
+ub = [390, 10, 1, 1, .4];
 
 % Normalized lower and upper bounds
 n_lb = zeros(size(lb));
@@ -84,7 +84,7 @@ if max(size(gcp)) == 0 % parallel pool needed
 end
 
 % Define function to be optimized
-fun = @(x)cost(x, lb, ub,yCYC, zCYC, pCYC, contStateIndices, -0.001, true);
+fun = @(x)cost(x, lb, ub,yCYC, zCYC, pCYC, contStateIndices, -0.00, true);
 
 nonlcon = [];
 opts = gaoptimset(...

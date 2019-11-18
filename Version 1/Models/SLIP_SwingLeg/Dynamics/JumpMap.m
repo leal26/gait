@@ -153,8 +153,8 @@ function [yPLUS, zPLUS, isTerminal] = JumpMap(yMINUS, zMINUS, p, event)
             right_TD = yMINUS(contStateIndices.t);
             prev_Y_R = current_Y_R;
             current_Y_R = yMINUS(2:end-1);
-            disp('right_TD')
-            disp(right_TD)
+%             disp('right_TD')
+%             disp(right_TD)
 %             disp('current_Y_R')
 %             disp(current_Y_R)
             

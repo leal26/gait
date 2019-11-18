@@ -6,7 +6,7 @@ function output = cost(parameters_nd, lb, ub,yCYC, zCYC, pCYC, contStateIndices,
     global ind_index
     global active_leg
     global heat_switch;
-    heat_switch = nan;
+
     parameters = (ub-lb).*parameters_nd + lb;
     % disp(parameters)
     IP.mean = parameters(1);
@@ -67,10 +67,10 @@ function output = cost(parameters_nd, lb, ub,yCYC, zCYC, pCYC, contStateIndices,
 
     output = 9999;
     if success
-        if max(simRES.t) > 10
+         if max(simRES.t) > 4
 
             output = periodicity;
-        end
+         end
     end
     if max_x ~= -9999 && store
 %         size(parameters)

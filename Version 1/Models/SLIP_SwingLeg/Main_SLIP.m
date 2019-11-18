@@ -63,8 +63,8 @@ addpath([GaitCreationDir,slash,'Models',slash,'SLIP_SwingLeg',slash,'Inputs;'])
 % zCYC = [1 0 1 0 0 0 0];
 % IP.duty = 1.;   
 % 3.909668726968498   0.033978956427332   0.002877539998629   0.004320773548430   0.017146826972944
-parameters = [387.6645163865866   005.2512256277763   000.4834709038690   000.2332068073740   005.3128729393923];
-force = -0.001;
+parameters = [389.3251    2.5030    0.6310    0.8442    0.2755];
+force = -0.00;
 
 period = 2.7419 ;
 right_TD = 0;
@@ -110,9 +110,9 @@ disp(calculate_specific_power(SMA_R_database.sigma(1:length(simRES.t)), ...
                              SMA_density, recOUTPUT.rate, 1))
 
 % Show animations
-% graphOUTPUT = SLIP_Model_Graphics_AdvancedPointFeet(pCYC); % Must be called again with new parameters p, such that the new angle of attack is visualized
-% graphOUTPUT.rate = 0.01;
-% [yOUT, zOUT, tOUT, te_all, periodicity] = HybridDynamics(yCYC, zCYC, pCYC, SMA_L, SMA_R, graphOUTPUT, simOptions);
+graphOUTPUT = SLIP_Model_Graphics_AdvancedPointFeet(pCYC); % Must be called again with new parameters p, such that the new angle of attack is visualized
+graphOUTPUT.rate = 0.01;
+[yOUT, zOUT, tOUT, te_all, periodicity] = HybridDynamics(yCYC, zCYC, pCYC, SMA_L, SMA_R, graphOUTPUT, simOptions);
 
 % recOUTPUT = RecordStateCLASS();
 % [yOUT, zOUT, tOUT, recOUTPUT] = HybridDynamics(yCYC, zCYC, pCYC, SMA_L, SMA_R,recOUTPUT, simOptions);
