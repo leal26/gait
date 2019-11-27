@@ -55,7 +55,7 @@ for i=1:(length(t)-1)
             end
 
             h_last = fzero(@(h) find_event(h, F_ty, y, t, i, j, prev_teOUT, Events),h);
-            y(:,i+1) = next_y(F_ty, y, t, h_last, i, 'take-off');
+            y(:,i+1) = next_y(F_ty, y, t, h_last, i, true);
             t(:,i+1) = t(:,i) + h_last;
             teOUT = t(:,i) + h_last;
         end
@@ -105,11 +105,7 @@ function [y_i1] = next_y(F_ty, y, t, h, i, store)
     k4 = F_ty((t(i)+h),(y(:,i)+k3*h));
 
     y_i1 = y(:,i) + (1/6)*(k1+2*k2+2*k3+k4)*h;
-    if strcmp(store, 'take-off')
-        store_flag = true;
-        F_ty(t(i) + h, y_i1);
-        store_flag = false;
-    end
+    i
 end
 
 function [inflections] = find_event(h, F_ty, y, t, i, j, prev_teOUT, Events)

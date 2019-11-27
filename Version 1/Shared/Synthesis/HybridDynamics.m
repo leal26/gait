@@ -184,16 +184,16 @@ function [yOUT, zOUT, tOUT, te_all, periodicity, varargout] = HybridDynamics(yIN
         % [t,y,teOUT,yeOUT,ieOUT] = ode_history_dependent(@(t,y) ODE(t,y,SMA_L,SMA_R),tspan,yIN,odeOPTIONS);
         % tspan = [0 5];
         % disp(active_leg)
-         try
-            
+          try
+
             [t,y,teOUT,yeOUT,ieOUT] = ode_history_dependent(@(t,y) ODE(t,y,SMA_L,SMA_R),outputIN.rate, tspan, yIN, @Events, @OutputFcn);
-%              disp(teOUT)
-%              disp(ieOUT)
-            if ~isempty(ieOUT)
-                if ieOUT == 4 && heat_switch && strcmp(active_leg,'right')
-                    heat_switch = false;
-                end
-            end
+%               disp(teOUT)
+%               disp(ieOUT)
+%             if ~isempty(ieOUT)
+%                 if ieOUT == 4 && heat_switch && strcmp(active_leg,'right')
+%                     heat_switch = false;
+%                 end
+%             end
             if abs(t(end)-tMAX)<1e-9
                 % Time boundary is reached
                 yIN = y(end,:)';  % This will be mapped to yOUT below.
@@ -201,8 +201,8 @@ function [yOUT, zOUT, tOUT, te_all, periodicity, varargout] = HybridDynamics(yIN
                 warning('The integration stops at the time boundary.');
                 break;  
             end    
-
-            if isempty(ieOUT) || (abs(prev_right_TD - right_TD) < 1e-4)
+            
+            if isempty(ieOUT) % || (abs(prev_right_TD - right_TD) < 1e-4)
                 % No event occurred. The simulation ran out of time without
                 % reaching the terminating event. Map final continuous states
                 % (discrete states were not altered) and set time to -1:
@@ -211,8 +211,10 @@ function [yOUT, zOUT, tOUT, te_all, periodicity, varargout] = HybridDynamics(yIN
                 try
                     periodicity = periodicity*10;
                 catch
+                    % disp('EMPTY')
                     periodicity = 9999;
                 end
+
                 break;    
             else
                 te_all(te_index) = teOUT;
@@ -226,6 +228,13 @@ function [yOUT, zOUT, tOUT, te_all, periodicity, varargout] = HybridDynamics(yIN
 
             end   
 
+            % disp(abs(prev_right_TD - right_TD))
+            if (abs(prev_right_TD - right_TD) < 1e-3) || y(2, end) < 0
+                % disp(y(:, end))
+                periodicity = 9999;
+                break; 
+            end
+            
             NoE=NoE+1;
 
             if NoE> 64
@@ -236,12 +245,18 @@ function [yOUT, zOUT, tOUT, te_all, periodicity, varargout] = HybridDynamics(yIN
             periodicity_R = norm(current_Y_R-prev_Y_R);
             % periodicity_L = norm(current_Y_L-prev_Y_L);
             periodicity = periodicity_R;
-            if periodicity < 1e-3
-                break
+%             if periodicity < 1e-3
+%                 break
+%             end
+            if prev_right_TD ~= 9999
+                yIN = y(end,:)';  % This will be mapped to yOUT below.
+                tIN = -1;
+
+                break;  
             end
-        catch
-            break   
-        end
+         catch
+             break   
+         end
     end
     if isa(outputIN, 'SLIP_Model_Graphics_AdvancedPointFeet')
         close(outputIN.video);

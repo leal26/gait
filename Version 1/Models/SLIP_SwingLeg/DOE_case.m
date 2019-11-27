@@ -18,7 +18,7 @@ y_periodic = simRES.continuousStates(plotStates,:);
 
 % ************************************
 GaitCreationDir = which(mfilename);
-GaitCreationDir = erase(GaitCreationDir, [filesep,'Models',filesep,'SLIP_SwingLeg',filesep,'DOE.m']);
+GaitCreationDir = erase(GaitCreationDir, [filesep,'Models',filesep,'SLIP_SwingLeg',filesep,'DOE_case.m']);
 % ************************************
 % ************************************
 if ~exist(GaitCreationDir,'dir')
@@ -62,13 +62,10 @@ addpath([GaitCreationDir,slash,'Models',slash,'SLIP_SwingLeg',slash,'phase_diagr
 addpath([GaitCreationDir,slash,'Models',slash,'SLIP_SwingLeg',slash,'Inputs;'])
                                               
 %% (c) DOE (mean, delta, phase for left and right legs):
-bounds = [[375,390]; ... 
-          [0,5]; ...
-          [0,.9]; ...
-          [0,.9]];
-parameters_nd = fullfact([8,8,8,8]);
+bounds = [[0,1]];
+parameters_nd = fullfact([1000]);
 parameters = parameters_nd - 1;
-for i=1:length(bounds)
+for i=1:1
     parameters(:,i) = bounds(i,1) + (bounds(i,2) - bounds(i,1))*parameters(:,i)/max(parameters(:,i));
 end
 result_matrix = [parameters, NaN*ones([length(parameters) 6])];
@@ -80,15 +77,18 @@ IP.mass = 10; % kg (used for normalizing)
 IP.gravity = 9.80665; % m/s2 (used for normalizing)
 IP.active_leg = 'right';
 SMA_density = 6450; %kg/m3
+figure(10)
+hold on
 for i=1:length(parameters)
     right_TD = 0;
-    IP.mean = parameters(i,1);
-    IP.amplitude = parameters(i,2);
-    IP.phase = parameters(i,3);
+    IP.mean = 390.0000     ;
+    IP.amplitude = 5.0000;
+    IP.phase = parameters(i,1);
+    IP.frequency = 1;
     IP_L = IP;
-    IP_L.phase = parameters(i,3);
+    IP_L.phase = 0;
     IP_R = IP;
-    IP_R.phase = parameters(i,4);
+    IP_R.phase = parameters(i,1);
     [SMA_L, SMA_R] = define_SMA(IP_L, IP_R);
     SMA_R.F_external = 0;
     recOUTPUT = RecordStateCLASS();
@@ -100,17 +100,17 @@ for i=1:length(parameters)
             [yOUT, zOUT, tOUT, te_all, periodicity, recOUTPUT] = HybridDynamics(yCYC, zCYC, pCYC, SMA_L, SMA_R, recOUTPUT, simOptions);
             simRES = recOUTPUT.retrieve();
             plotStates = [ contStateIndices.x, contStateIndices.dx,contStateIndices.y, contStateIndices.dy, contStateIndices.phiL, contStateIndices.dphiL,contStateIndices.phiR, contStateIndices.dphiR];
-
+            plot(simRES.t, simRES.continuousStates(contStateIndices.dx,:), 'DisplayName', num2str(parameters(i,1)))
             if min(simRES.continuousStates(contStateIndices.y,:)) > 0
                 max_x = max(simRES.continuousStates(contStateIndices.x,:));
                 av_dx = mean(simRES.continuousStates(contStateIndices.dx,:));
                 av_dy = mean(simRES.continuousStates(contStateIndices.dy,:));
-                power_R = calculate_specific_power(SMA_R_database.sigma(1:length(simRES.t)), ...
-                                             SMA_R_database.eps(1:length(simRES.t)), ...
-                                             SMA_density, recOUTPUT.rate, 1);
-                power_L = calculate_specific_power(SMA_L_database.sigma(1:length(simRES.t)), ...
-                                             SMA_L_database.eps(1:length(simRES.t)), ...
-                                             SMA_density, recOUTPUT.rate, 1);
+                power_R = calculate_specific_power(SMA_R_database.sigma(1:length(SMA_R_database.t)), ...
+                             SMA_R_database.eps(1:length(SMA_R_database.t)), ...
+                             SMA_density, SMA_R_database.t, 1);
+                power_L = calculate_specific_power(SMA_L_database.sigma(1:length(SMA_R_database.t)), ...
+                             SMA_L_database.eps(1:length(SMA_R_database.t)), ...
+                             SMA_density, SMA_R_database.t, 1);
             else
                 success = false;
             end
@@ -137,12 +137,12 @@ for i=1:length(parameters)
     result_matrix(i,end-1) = power_R;
     result_matrix(i,end) = periodicity;
 end
-
+legend()
 
 % Write to file
-fileID = fopen(strcat('DOE.txt'),'w');
+fileID = fopen(strcat('DOE_frequencies.txt'),'w');
 fprintf(fileID,'mean\tdelta\tphaseL\tphaseR\ttime\tx\tdx\tdy\tpower_L\tpower_R\tperiodicity\n');
-formatSpec = '%8.3f\t%8.3f\t%8.3f\t%8.3f\t%8.3f\t%8.3f\t%8.3f\t%8.3f\t%8.3f\t%8.3f\t%8.3f\n';
+formatSpec = '%8.3f\t8.3f\t%8.3f\t%8.3f\t%8.3f\t%8.3f\t%8.3f\t%8.3f\t%8.3f\t%8.3f\t%8.3f\n';
 for ii=1:length(parameters)
     fprintf(fileID,formatSpec, result_matrix(ii,:));
 end
@@ -150,5 +150,26 @@ fclose(fileID);
 
 result_matrix(result_matrix==9999) = NaN;
 output = result_matrix(~isnan(result_matrix(:,end)),:);
-save('DOE.mat', 'result_matrix', 'parameters_nd', 'output')
-design_plots(output, y_periodic);
+p = parameters(~isnan(result_matrix(:,end)),:);
+save('DOE_frequencies.mat', 'result_matrix', 'parameters_nd', 'output')
+design_plots(output, p, y_periodic);
+
+tol = 6e-2;
+i_right_actuator = output(:,end-1) > tol;
+i_left_actuator = output(:,end-2) > tol;
+i_right_brake = output(:,end-1) < -tol;
+i_left_brake = output(:,end-2) < -tol;
+i_right_strut = ~i_right_actuator & ~i_right_brake;
+i_left_strut = ~i_left_actuator & ~i_left_brake;
+
+right_actuator = output(i_right_actuator, :);
+left_actuator = output(i_left_actuator, :);
+right_brake = output(i_right_brake, :);
+left_brake = output(i_left_brake, :);
+right_strut = output(i_right_strut, :);
+left_strut = output(i_left_strut, :);
+
+target = [-38.799753	-6.666726	];
+residual = abs(output(:, end-2:end-1) - target);
+[M,I] = min(residual);
+disp(p(I,:))

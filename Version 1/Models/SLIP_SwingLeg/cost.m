@@ -20,6 +20,14 @@ function output = cost(parameters_nd, lb, ub,yCYC, zCYC, pCYC, contStateIndices,
     IP_L.phase = parameters(3);
     IP_R = IP;
     IP_R.phase = parameters(4);
+    
+    yCYC(2) = parameters(6);
+    yCYC(3) = parameters(7);
+    yCYC(4) = parameters(8);
+    yCYC(7) = - acos(parameters(7));
+    yCYC(8) = - parameters(9);
+    yCYC(9) = acos(parameters(7));
+    yCYC(10) = parameters(9);
     [SMA_L, SMA_R] = define_SMA(IP_L, IP_R);
     if ~isempty(force)
         SMA_R.F_external = force;
@@ -67,10 +75,10 @@ function output = cost(parameters_nd, lb, ub,yCYC, zCYC, pCYC, contStateIndices,
 
     output = 9999;
     if success
-         if max(simRES.t) > 4
+         % if max(simRES.t) > 4
 
             output = periodicity;
-         end
+         % end
     end
     if max_x ~= -9999 && store
 %         size(parameters)

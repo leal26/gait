@@ -18,7 +18,7 @@ y_periodic = simRES.continuousStates(plotStates,:);
 
 % ************************************
 GaitCreationDir = which(mfilename);
-GaitCreationDir = erase(GaitCreationDir, [filesep,'Models',filesep,'SLIP_SwingLeg',filesep,'DOE.m']);
+GaitCreationDir = erase(GaitCreationDir, [filesep,'Models',filesep,'SLIP_SwingLeg',filesep,'DOE_frequencies.m']);
 % ************************************
 % ************************************
 if ~exist(GaitCreationDir,'dir')
@@ -65,8 +65,9 @@ addpath([GaitCreationDir,slash,'Models',slash,'SLIP_SwingLeg',slash,'Inputs;'])
 bounds = [[375,390]; ... 
           [0,5]; ...
           [0,.9]; ...
-          [0,.9]];
-parameters_nd = fullfact([8,8,8,8]);
+          [0,.9]; ...
+          [0.1, 1]];
+parameters_nd = fullfact([8,8,8,8,8]);
 parameters = parameters_nd - 1;
 for i=1:length(bounds)
     parameters(:,i) = bounds(i,1) + (bounds(i,2) - bounds(i,1))*parameters(:,i)/max(parameters(:,i));
@@ -85,6 +86,7 @@ for i=1:length(parameters)
     IP.mean = parameters(i,1);
     IP.amplitude = parameters(i,2);
     IP.phase = parameters(i,3);
+    IP.frequency = parameters(i,end);
     IP_L = IP;
     IP_L.phase = parameters(i,3);
     IP_R = IP;
@@ -105,12 +107,12 @@ for i=1:length(parameters)
                 max_x = max(simRES.continuousStates(contStateIndices.x,:));
                 av_dx = mean(simRES.continuousStates(contStateIndices.dx,:));
                 av_dy = mean(simRES.continuousStates(contStateIndices.dy,:));
-                power_R = calculate_specific_power(SMA_R_database.sigma(1:length(simRES.t)), ...
-                                             SMA_R_database.eps(1:length(simRES.t)), ...
-                                             SMA_density, recOUTPUT.rate, 1);
-                power_L = calculate_specific_power(SMA_L_database.sigma(1:length(simRES.t)), ...
-                                             SMA_L_database.eps(1:length(simRES.t)), ...
-                                             SMA_density, recOUTPUT.rate, 1);
+                power_R = calculate_specific_power(SMA_R_database.sigma(1:length(SMA_R_database.t)), ...
+                             SMA_R_database.eps(1:length(SMA_R_database.t)), ...
+                             SMA_density, SMA_R_database.t, 1);
+                power_L = calculate_specific_power(SMA_L_database.sigma(1:length(SMA_R_database.t)), ...
+                             SMA_L_database.eps(1:length(SMA_R_database.t)), ...
+                             SMA_density, SMA_R_database.t, 1);
             else
                 success = false;
             end
@@ -140,9 +142,9 @@ end
 
 
 % Write to file
-fileID = fopen(strcat('DOE.txt'),'w');
+fileID = fopen(strcat('DOE_frequencies.txt'),'w');
 fprintf(fileID,'mean\tdelta\tphaseL\tphaseR\ttime\tx\tdx\tdy\tpower_L\tpower_R\tperiodicity\n');
-formatSpec = '%8.3f\t%8.3f\t%8.3f\t%8.3f\t%8.3f\t%8.3f\t%8.3f\t%8.3f\t%8.3f\t%8.3f\t%8.3f\n';
+formatSpec = '%8.3f\t8.3f\t%8.3f\t%8.3f\t%8.3f\t%8.3f\t%8.3f\t%8.3f\t%8.3f\t%8.3f\t%8.3f\n';
 for ii=1:length(parameters)
     fprintf(fileID,formatSpec, result_matrix(ii,:));
 end
@@ -150,5 +152,26 @@ fclose(fileID);
 
 result_matrix(result_matrix==9999) = NaN;
 output = result_matrix(~isnan(result_matrix(:,end)),:);
-save('DOE.mat', 'result_matrix', 'parameters_nd', 'output')
+p = parameters(~isnan(result_matrix(:,end)),:);
+save('DOE_frequencies.mat', 'result_matrix', 'parameters_nd', 'output')
 design_plots(output, y_periodic);
+
+tol = 6e-2;
+i_right_actuator = output(:,end-1) > tol;
+i_left_actuator = output(:,end-2) > tol;
+i_right_brake = output(:,end-1) < -tol;
+i_left_brake = output(:,end-2) < -tol;
+i_right_strut = ~i_right_actuator & ~i_right_brake;
+i_left_strut = ~i_left_actuator & ~i_left_brake;
+
+right_actuator = output(i_right_actuator, :);
+left_actuator = output(i_left_actuator, :);
+right_brake = output(i_right_brake, :);
+left_brake = output(i_left_brake, :);
+right_strut = output(i_right_strut, :);
+left_strut = output(i_left_strut, :);
+
+target = [11.3574, 7.773];
+residual = abs(output(:, end-2:end-1) - target);
+[M,I] = min(residual);
+disp(p(I,:))

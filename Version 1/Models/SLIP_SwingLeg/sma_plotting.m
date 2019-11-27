@@ -1,4 +1,4 @@
-function [] = sma_plotting(T, SMA_L, SMA_R, te_all)
+function [] = sma_plotting(SMA_L, SMA_R, te_all)
 global SMA_L_database
 global SMA_R_database
 global heat_switch
@@ -14,6 +14,8 @@ for i=1:length(te_all)
         xline(te_all(i), '--');
     end
 end
+T = SMA_R_database.t;
+TT = linspace(0, max(T), 1000);
 plot(T,SMA_L_database.eps(1:length(T)),'LineWidth',2,'color',color_l)
 plot(T,SMA_R_database.eps(1:length(T)),'LineWidth',2,'color',color_r)
 % legend('Left leg','Right leg')
@@ -27,12 +29,10 @@ for i=1:length(te_all)
         xline(te_all(i), '--');
     end
 end
-plot(T,SMA_L.T_function(T),'--','LineWidth',2,'color',color_l)
-plot(T,SMA_R.T_function(T),'--','LineWidth',2,'color',color_r)
-plot(T,SMA_L_database.T(1:length(T)),'LineWidth',2,'color',color_l)
-
-
-plot(T,SMA_R_database.T(1:length(T)),'LineWidth',2,'color',color_r)
+% plot(TT,SMA_L.T_function(TT),'--','LineWidth',2,'color',color_l)
+% plot(TT,SMA_R.T_function(TT),'--','LineWidth',2,'color',color_r)
+plot(SMA_R_database.t,SMA_L_database.T(1:length(SMA_R_database.t)),'LineWidth',2,'color',color_l)
+plot(SMA_R_database.t,SMA_R_database.T(1:length(SMA_R_database.t)),'LineWidth',2,'color',color_r)
 
 % legend('Left leg','Right leg')
 xlabel('Stride Time $[\sqrt{l_o/g}]$','Interpreter','LaTex')

@@ -39,6 +39,7 @@ if isempty(SMA_L_database)
     SMA_R_database.MVF = NaN(n,1);
     SMA_R_database.eps_t = NaN(n,1);
     SMA_R_database.E = NaN(n,1);
+    SMA_R_database.t = NaN(n,1);
     
     % Storing initial conditions
     SMA_R_database.eps(1) = SMA_R.eps_0;
@@ -46,7 +47,7 @@ if isempty(SMA_L_database)
     SMA_R_database.sigma(1) = SMA_R.sigma_0;
     SMA_R_database.MVF(1) = SMA_R.MVF_init;
     SMA_R_database.eps_t(1) = SMA_R.eps_t_0;
-    
+    SMA_R_database.t(1) = 0;
     try
         SMA_R_database.eps(i,1) = SMA_R.eps;
         SMA_R_database.T(i,1) = SMA_R.T;

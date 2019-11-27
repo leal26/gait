@@ -125,6 +125,7 @@ function dydt = FlowMap(t, y, z, p, SMA_L, SMA_R, varargin)
     
     if store_flag && isnan(k)
         store(SMA_L, SMA_R)
+        SMA_R_database.t(SMA_R_database.index) = t;
 %         scatter(t,Fr,'k')
     end
     Fx=-Fl*sin(phi_L+alpha)-Fr*sin(phi_R+alpha)-SMA_R.F_external;
