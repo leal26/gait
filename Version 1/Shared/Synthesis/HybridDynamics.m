@@ -184,11 +184,14 @@ function [yOUT, zOUT, tOUT, te_all, periodicity, varargout] = HybridDynamics(yIN
         % [t,y,teOUT,yeOUT,ieOUT] = ode_history_dependent(@(t,y) ODE(t,y,SMA_L,SMA_R),tspan,yIN,odeOPTIONS);
         % tspan = [0 5];
         % disp(active_leg)
-          try
+%           try
 
             [t,y,teOUT,yeOUT,ieOUT] = ode_history_dependent(@(t,y) ODE(t,y,SMA_L,SMA_R),outputIN.rate, tspan, yIN, @Events, @OutputFcn);
-%               disp(teOUT)
-%               disp(ieOUT)
+              try
+                fprintf('%i\t%f\t%i\n', [ieOUT, teOUT, SMA_R_database.index]);
+              catch
+                fprintf('%i\t%f\t%i\n',[ieOUT, teOUT, 1]);
+              end
 %             if ~isempty(ieOUT)
 %                 if ieOUT == 4 && heat_switch && strcmp(active_leg,'right')
 %                     heat_switch = false;
@@ -254,9 +257,9 @@ function [yOUT, zOUT, tOUT, te_all, periodicity, varargout] = HybridDynamics(yIN
 
                 break;  
             end
-         catch
-             break   
-         end
+%          catch
+%              break   
+%          end
     end
     if isa(outputIN, 'SLIP_Model_Graphics_AdvancedPointFeet')
         close(outputIN.video);

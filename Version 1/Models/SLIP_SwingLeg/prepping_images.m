@@ -3,11 +3,11 @@ clear all
 clc
 
 SMA_density = 6450;
-data = ["brake", "strut","actuator"];
-labels = ["Brake", "Strut","Actuator"];
+data = ["brake", "actuator"];
+labels = ["Brake", "Actuator"];
 color_brake = [153/256,153/256,153/256];
-color_strut = [102/256,102/256,102/256];
-color_actuator = [0/256,0/256,0/256];
+color_strut = [0/256,0/256,0/256];
+color_actuator = [102/256,102/256,102/256];
 colors = [color_brake; color_strut; color_actuator];
 figure(1);
 xlabel('Time ($\sqrt{l_o/g}$)','Interpreter','LaTex')
@@ -49,11 +49,15 @@ hold on
 % hold on
 
 figure(6)
+set(gca,'FontName','Times New Roman','fontsize', 14,'linewidth',1.15)
+set(gca,'XMinorTick','off','YMinorTick','off')
+xlim([0,2.02])
 hold on
 
 for i=1:length(data)
     c = colors(i,:);
     load(data(i))
+    disp(parameters)
     T = SMA_R_database.t;
     
     figure(1);
@@ -72,7 +76,8 @@ for i=1:length(data)
     plot(simRES.t, simRES.continuousStates(contStateIndices.dx,:), '-','LineWidth',2,'color',c, 'DisplayName', labels(i))
     
     figure(6)
-    plot(100*SMA_L_database.eps(1:length(T)), SMA_L_database.MVF(1:length(T)), '-','LineWidth',2,'color',c, 'DisplayName', 'Left ' + data(i))
+    plot(SMA_R_database.t, SMA_L_database.MVF(1:length(T)), '-','LineWidth',2,'color',c, 'DisplayName', 'Left ' + data(i))
+    plot(SMA_R_database.t, SMA_R_database.MVF(1:length(T)), '--','LineWidth',2,'color',c, 'DisplayName', 'Right ' + data(i))
 %     figure(5)
 %     scale = 1;
 %     eps = SMA_L_database.eps;

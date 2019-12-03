@@ -60,7 +60,7 @@ ylabel('Power right','Interpreter','LaTex');
 set(gca,'FontName', 'Times New Roman','FontSize', 14);
 xline(0);
 yline(0);
-xlim([-50, 30])
+xlim([-70, 30])
 ylim([-90, 10])
 % colorbar;
 end

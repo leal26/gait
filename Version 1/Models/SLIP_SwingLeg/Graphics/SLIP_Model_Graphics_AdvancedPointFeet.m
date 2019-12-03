@@ -64,7 +64,7 @@ classdef SLIP_Model_Graphics_AdvancedPointFeet < OutputCLASS
             % Initialize the graphics
             obj.fig = figure();
             clf(obj.fig);
-            set(obj.fig, 'Renderer','OpenGL');
+            set(obj.fig, 'Renderer','Painters');
             % Set some window properties
             set(obj.fig,'Name','2D-Output of a SLIP model');  % Window title
             set(obj.fig,'Color','w');         % Background color
@@ -205,6 +205,12 @@ classdef SLIP_Model_Graphics_AdvancedPointFeet < OutputCLASS
         axis([x_-1,x_+1,-0.2,1.8])
         box on;
         drawnow();
+        try
+            filename = sprintf('%i.pdf', SMA_R_database.index);
+        catch
+            filename = sprintf('%i.pdf', 1);
+        end
+        saveas(gcf, filename) 
         writeVideo(obj.video,getframe(gcf));
         end
         

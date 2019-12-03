@@ -67,7 +67,7 @@ addpath([GaitCreationDir,slash,'Models',slash,'SLIP_SwingLeg',slash,'Inputs;'])
 % brake
 % parameters = [387.8571    2.8571    0.5143    0.9000    0.7429];
 % actuator
-parameters = [390.0000    5.0000         0    0.2814    1.0000];
+parameters = [390.0000    5.0000    0.7714    0.3857    1.0000];
 force = -0.000;
 
 period = 2.7419 ;
@@ -120,9 +120,12 @@ phase_space(simRES.continuousStates(plotStates,:))
 disp(calculate_specific_power(SMA_R_database.sigma(1:length(SMA_R_database.t)), ...
                              SMA_R_database.eps(1:length(SMA_R_database.t)), ...
                              SMA_density, SMA_R_database.t, 1))
-
-% save('brake')
+disp(calculate_specific_power(SMA_L_database.sigma(1:length(SMA_R_database.t)), ...
+                             SMA_L_database.eps(1:length(SMA_R_database.t)), ...
+                             SMA_density, SMA_R_database.t, 1))
+% save('actuator')
 % Show animations
+BREAK
 graphOUTPUT = SLIP_Model_Graphics_AdvancedPointFeet(pCYC); % Must be called again with new parameters p, such that the new angle of attack is visualized
 graphOUTPUT.rate = 0.01;
 [yOUT, zOUT, tOUT, te_all, periodicity] = HybridDynamics(yCYC, zCYC, pCYC, SMA_L, SMA_R, graphOUTPUT, simOptions);

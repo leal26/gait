@@ -81,18 +81,18 @@ figure(10)
 hold on
 for i=1:length(parameters)
     right_TD = 0;
-    IP.mean = 390.0000     ;
-    IP.amplitude = 5.0000;
+    IP.mean = 387.8571        ;
+    IP.amplitude = 2.8571    ;
     IP.phase = parameters(i,1);
-    IP.frequency = 1;
+    IP.frequency = 0.7429;
     IP_L = IP;
-    IP_L.phase = 0;
+    IP_L.phase = 0.5143;
     IP_R = IP;
     IP_R.phase = parameters(i,1);
     [SMA_L, SMA_R] = define_SMA(IP_L, IP_R);
     SMA_R.F_external = 0;
     recOUTPUT = RecordStateCLASS();
-    recOUTPUT.rate = 0.01;
+    recOUTPUT.rate = 0.001;
     % Checking Austenite constraint
     success = true;
     if SMA_R.T_function(0) >= SMA_R.A_f
@@ -151,7 +151,7 @@ fclose(fileID);
 result_matrix(result_matrix==9999) = NaN;
 output = result_matrix(~isnan(result_matrix(:,end)),:);
 p = parameters(~isnan(result_matrix(:,end)),:);
-save('DOE_frequencies.mat', 'result_matrix', 'parameters_nd', 'output')
+save('DOE_brake2.mat', 'result_matrix', 'parameters_nd', 'output')
 design_plots(output, p, y_periodic);
 
 tol = 6e-2;
