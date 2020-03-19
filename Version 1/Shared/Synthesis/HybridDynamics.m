@@ -187,11 +187,11 @@ function [yOUT, zOUT, tOUT, te_all, periodicity, varargout] = HybridDynamics(yIN
 %           try
 
             [t,y,teOUT,yeOUT,ieOUT] = ode_history_dependent(@(t,y) ODE(t,y,SMA_L,SMA_R),outputIN.rate, tspan, yIN, @Events, @OutputFcn);
-              try
-                fprintf('%i\t%f\t%i\n', [ieOUT, teOUT, SMA_R_database.index]);
-              catch
-                fprintf('%i\t%f\t%i\n',[ieOUT, teOUT, 1]);
-              end
+%               try
+%                 fprintf('%i\t%f\t%i\n', [ieOUT, teOUT, SMA_R_database.index]);
+%               catch
+%                 fprintf('%i\t%f\t%i\n',[ieOUT, teOUT, 1]);
+%               end
 %             if ~isempty(ieOUT)
 %                 if ieOUT == 4 && heat_switch && strcmp(active_leg,'right')
 %                     heat_switch = false;

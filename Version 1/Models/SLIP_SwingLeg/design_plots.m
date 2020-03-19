@@ -1,7 +1,5 @@
 function [] = design_plots(matrix, parameters, y_periodic)
 
-phase_L = 100*matrix(:,3);
-
 max_x = matrix(:,end-5);
 av_dx = matrix(:,end-4);
 av_dy = matrix(:,end-3);
@@ -31,7 +29,7 @@ set(gca,'FontName', 'Times New Roman','FontSize', 14);
 
 subplot(3,1,2)
 hold on
-scatter(power_R,av_dx,[],parameters,'filled');
+scatter(parameters,av_dx,[],parameters,'filled');
 % yline(max(y_periodic(3,:)),'linewidth',2);
 xlabel('Specific Power, right leg','Interpreter','LaTex');
 ylabel('Average Speed','Interpreter','LaTex');
@@ -53,15 +51,16 @@ periodicity(periodicity == 9990) = NaN;
 periodicity(periodicity > 3) = NaN;
 disp(max(periodicity))
 disp(min(periodicity))
-scatter(power_L, power_R,[], [0/256,0/256,0/256], 'filled');
+scatter(power_L, power_R,[], parameters, 'filled');
 %xline(max(y_periodic(4,:)),'linewidth',2);
 xlabel('Power left','Interpreter','LaTex');
 ylabel('Power right','Interpreter','LaTex');
 set(gca,'FontName', 'Times New Roman','FontSize', 14);
 xline(0);
 yline(0);
-xlim([-70, 30])
-ylim([-90, 10])
-% colorbar;
+% xlim([-70, 30])
+% ylim([-90, 10])
+colorbar;
+
 end
 

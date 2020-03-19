@@ -123,11 +123,11 @@ disp(calculate_specific_power(SMA_R_database.sigma(1:length(SMA_R_database.t)), 
 disp(calculate_specific_power(SMA_L_database.sigma(1:length(SMA_R_database.t)), ...
                              SMA_L_database.eps(1:length(SMA_R_database.t)), ...
                              SMA_density, SMA_R_database.t, 1))
-% save('actuator')
+% save('mixed')
 % Show animations
-BREAK
+
 graphOUTPUT = SLIP_Model_Graphics_AdvancedPointFeet(pCYC); % Must be called again with new parameters p, such that the new angle of attack is visualized
-graphOUTPUT.rate = 0.01;
+graphOUTPUT.rate = 0.005;
 [yOUT, zOUT, tOUT, te_all, periodicity] = HybridDynamics(yCYC, zCYC, pCYC, SMA_L, SMA_R, graphOUTPUT, simOptions);
 
 % recOUTPUT = RecordStateCLASS();

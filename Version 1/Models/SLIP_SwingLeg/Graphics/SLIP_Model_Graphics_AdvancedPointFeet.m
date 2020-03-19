@@ -68,7 +68,7 @@ classdef SLIP_Model_Graphics_AdvancedPointFeet < OutputCLASS
             % Set some window properties
             set(obj.fig,'Name','2D-Output of a SLIP model');  % Window title
             set(obj.fig,'Color','w');         % Background color
-            set(obj.fig, 'position', [100 100 600 600]);
+            set(obj.fig, 'position', [100 200 1200 500]);
             ax = gca;
             outerpos = ax.OuterPosition;
             ti = ax.TightInset; 
@@ -77,7 +77,7 @@ classdef SLIP_Model_Graphics_AdvancedPointFeet < OutputCLASS
             ax_width = outerpos(3) - ti(1) - ti(3);
             ax_height = outerpos(4) - ti(2) - ti(4);
             ax.Position = [left bottom ax_width ax_height];
-            
+            subplot(1,2,1)
             box on
             axis off;
             % Define some arbitrary states:
@@ -91,6 +91,7 @@ classdef SLIP_Model_Graphics_AdvancedPointFeet < OutputCLASS
                 MVF = 0;
             end
             % The representation of the back left leg as a line object:
+            
             obj.SpringLine_l = DrawLegsLeftPointFeet(x,y,l_leg,phi_body,MVF);
             
             vert_x_out = [-20 100 100 -20];
@@ -133,6 +134,30 @@ classdef SLIP_Model_Graphics_AdvancedPointFeet < OutputCLASS
             obj.COGPatch = patch(vert_x, vert_y, cat(3,[1 0 1 0], [1 0 1 0],[1 0 1 0]),'LineWidth',3); 
             % Set up view:
 
+            subplot(1,2,2)
+            box on
+
+            % plot(SMA_R_database.eps(1:length(T)), ...
+            %      SMA_R_database.sigma(1:length(T))/1e6, ...
+            %      'LineWidth',2,'color',color_r, ...
+            %      'DisplayName', 'Right leg')
+
+            colorMap = [linspace(162,0,256)', linspace(20,68,256)', linspace(47,128,256)']/256;
+            colormap(colorMap);
+            margin = 0.1;
+
+            xlim = [0, 13];
+            ylim = [0, 155];
+
+            set(gca, 'Xlim', xlim, 'YLim', ylim)
+            xlabel('Strain (0.001 m/m)','Interpreter','LaTex', ...
+                   'FontName','Times New Roman','fontsize', 14)
+            ylabel('Stress (MPa)','Interpreter','LaTex', ...
+                   'FontName','Times New Roman','fontsize', 14)
+            title('Active leg: Right leg')
+            colorbar
+            caxis([0 0.2])
+            subplot(1,2,1)
             obj.video = VideoWriter('test','MPEG-4');
             obj.video.Quality = 100;
             open(obj.video);
@@ -142,7 +167,8 @@ classdef SLIP_Model_Graphics_AdvancedPointFeet < OutputCLASS
         % Updated function.  Is called by the integrator:
         function obj = update(obj, y, z, ~, ~)
         global SMA_L_database
-        global SMA_R_database   
+        global SMA_R_database
+        global active_leg
         % Get a mapping for the state and parameter vectors.  This allows us
         % to use a more readable syntax: "y(contStateIndices.dy)" instead of
         % "y(3)" while still operating with vectors and not with structs.
@@ -204,14 +230,25 @@ classdef SLIP_Model_Graphics_AdvancedPointFeet < OutputCLASS
 
         axis([x_-1,x_+1,-0.2,1.8])
         box on;
+        
+        subplot(1,2,2)
+        hold off
+%         try
+            sma_animating(z(discStateIndices.rphase), z(discStateIndices.lphase))
+%         catch
+%             disp('Failed')
+%         end
+        subplot(1,2,1)
+        a = annotation('textbox',[.15 .6 .3 .3],'String','Mixed case','FitBoxToText','on','FontSize',18,'FontName','Times New Roman', 'HorizontalAlignment', 'center');
         drawnow();
-        try
-            filename = sprintf('%i.pdf', SMA_R_database.index);
-        catch
-            filename = sprintf('%i.pdf', 1);
-        end
-        saveas(gcf, filename) 
+%         try
+%             filename = sprintf('%i.pdf', SMA_R_database.index);
+%         catch
+%             filename = sprintf('%i.pdf', 1);
+%         end
+%         saveas(gcf, filename) 
         writeVideo(obj.video,getframe(gcf));
+        delete(a)
         end
         
         

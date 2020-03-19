@@ -63,7 +63,7 @@ addpath([GaitCreationDir,slash,'Models',slash,'SLIP_SwingLeg',slash,'Inputs;'])
                                               
 %% (c) DOE (mean, delta, phase for left and right legs):
 bounds = [[0,1]];
-parameters_nd = fullfact([1000]);
+parameters_nd = fullfact([500]);
 parameters = parameters_nd - 1;
 for i=1:1
     parameters(:,i) = bounds(i,1) + (bounds(i,2) - bounds(i,1))*parameters(:,i)/max(parameters(:,i));
@@ -77,16 +77,17 @@ IP.mass = 10; % kg (used for normalizing)
 IP.gravity = 9.80665; % m/s2 (used for normalizing)
 IP.active_leg = 'right';
 SMA_density = 6450; %kg/m3
-figure(10)
+% figure(10)
+t0 = tic;
 hold on
 for i=1:length(parameters)
     right_TD = 0;
-    IP.mean = 387.8571        ;
-    IP.amplitude = 2.8571    ;
+    IP.mean = 390;
+    IP.amplitude = 3;
     IP.phase = parameters(i,1);
-    IP.frequency = 0.7429;
+    IP.frequency = 1;
     IP_L = IP;
-    IP_L.phase = 0.5143;
+    IP_L.phase = 0;
     IP_R = IP;
     IP_R.phase = parameters(i,1);
     [SMA_L, SMA_R] = define_SMA(IP_L, IP_R);
@@ -128,7 +129,16 @@ for i=1:length(parameters)
         power_R = 9999;
         periodicity = 9990;
     end
-    fprintf('%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\n', i, max(simRES.t), max_x, av_dx, av_dy, power_L, power_R, periodicity)
+    % fprintf('%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\n', i, max(simRES.t), max_x, av_dx, av_dy, power_L, power_R, periodicity)
+    if rem(i,10) == 0
+         
+        dt = toc(t0);
+        dp = i;
+        v = dp/dt;
+        remaining_p = length(parameters) - i;
+        remaining_time = remaining_p/v/3600;
+        fprintf('At design %i, remaining time is %f hours\n', i, remaining_time)
+    end
     result_matrix(i,end-6) = max(simRES.t);
     result_matrix(i,end-5) = max_x;
     result_matrix(i,end-4) = av_dx;
@@ -151,7 +161,7 @@ fclose(fileID);
 result_matrix(result_matrix==9999) = NaN;
 output = result_matrix(~isnan(result_matrix(:,end)),:);
 p = parameters(~isnan(result_matrix(:,end)),:);
-save('DOE_brake2.mat', 'result_matrix', 'parameters_nd', 'output')
+save('DOE_30.mat', 'result_matrix', 'parameters_nd', 'output')
 design_plots(output, p, y_periodic);
 
 tol = 6e-2;

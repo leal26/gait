@@ -1,0 +1,45 @@
+function [] = sma_animating()
+global SMA_L_database
+global SMA_R_database
+global active_leg
+
+
+T = SMA_R_database.t;
+
+colorMap = [linspace(162,0,256)', linspace(20,68,256)', linspace(47,128,256)']/256;
+colormap(colorMap);
+
+n = length(SMA_R_database.t(~isnan(SMA_R_database.t())));
+
+
+    t = SMA_R_database.t(i);
+    if t <= te_all(1)
+        title('Active leg: Right')
+        x = 1000*SMA_R_database.eps(1:n)';
+        y = SMA_R_database.sigma(1:n)'/1e6;
+        z = zeros(size(x));
+        col = SMA_R_database.MVF(1:length(T))';
+    elseif (t > te_all(1)) && (t < te_all(3))
+            title('Active leg: None')
+    else
+            title('Active leg: Left')
+        x = 1000*SMA_L_database.eps(1:n)';
+        y = SMA_L_database.sigma(1:n)'/1e6;
+        z = zeros(size(x));
+        col = SMA_L_database.MVF(1:length(T))';
+    end
+    delete(surf)
+    if (t <= te_all(1)) || (t >= te_all(3))
+        surf = surface([x(1:i+1);x(1:i+1)],[y(1:i+1);y(1:i+1)],[z(1:i+1);z(1:i+1)],[col(1:i+1);col(1:i+1)],...
+                'facecol','no',...
+                'edgecol','interp',...
+                'linew',2); 
+    end
+
+
+% xlim([0 0.013])
+% ylim([0 150])
+
+% legend('Location','best')
+
+end
