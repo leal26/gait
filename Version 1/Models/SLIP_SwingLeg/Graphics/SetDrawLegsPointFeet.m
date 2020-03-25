@@ -19,6 +19,8 @@ Blue = [0 68/256 .5]; %[0 68 158]/256
 MVF_max = .2;
 if isnan(MVF)
     spring_color=Red;
+elseif MVF > 0.2
+    spring_color=Blue;
 else
     spring_color = Blue*MVF/MVF_max + Red*(MVF_max-MVF)/MVF_max;
 end

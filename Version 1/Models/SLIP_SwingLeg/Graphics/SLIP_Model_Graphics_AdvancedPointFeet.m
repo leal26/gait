@@ -239,7 +239,7 @@ classdef SLIP_Model_Graphics_AdvancedPointFeet < OutputCLASS
 %             disp('Failed')
 %         end
         subplot(1,2,1)
-        a = annotation('textbox',[.15 .6 .3 .3],'String','Mixed case','FitBoxToText','on','FontSize',18,'FontName','Times New Roman', 'HorizontalAlignment', 'center');
+        a = annotation('textbox',[.15 .6 .3 .3],'String','Actuator & Brake','FitBoxToText','on','FontSize',18,'FontName','Times New Roman', 'HorizontalAlignment', 'center');
         drawnow();
 %         try
 %             filename = sprintf('%i.pdf', SMA_R_database.index);

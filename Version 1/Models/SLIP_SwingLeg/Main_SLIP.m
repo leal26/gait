@@ -64,9 +64,16 @@ addpath([GaitCreationDir,slash,'Models',slash,'SLIP_SwingLeg',slash,'Inputs;'])
 % IP.duty = 1.;   
 % 3.909668726968498   0.033978956427332   0.002877539998629   0.004320773548430   0.017146826972944
 
+
+% linear
+% parameters = [5000  0   0   0    1.0000];
+% pseudoelastic
+% parameters = [390  0   0   0    1.0000];
 % brake
 % parameters = [387.8571    2.8571    0.5143    0.9000    0.7429];
 % actuator
+% parameters = [390.0000    5.0000         0    0.41579    1.0000];
+% mixed
 parameters = [390.0000    5.0000    0.7714    0.3857    1.0000];
 force = -0.000;
 

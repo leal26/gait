@@ -17,20 +17,21 @@ colormap(colorMap);
 margin = 0.1;
 
 xlim = [0, 13];
-ylim = [0, 155];
+ylim = [0, 170];
 
 set(gca, 'Xlim', xlim, 'YLim', ylim, 'FontName','Times New Roman','fontsize', 14)
 xlabel('Strain (0.001 m/m)', ...
        'FontName','Times New Roman','fontsize', 14)
 ylabel('Stress (MPa)', ...
        'FontName','Times New Roman','fontsize', 14)
-title('Active leg: Right leg', 'FontName','Times New Roman','fontsize', 14)
+
 h = colorbar;
 caxis([0 20])
 set(h,'YTick', [0 20], 'FontName','Times New Roman','fontsize', 14)
 ylabel(h,'Martensitic volume fraction (%)', 'FontName','Times New Roman','fontsize', 14, 'Rotation', 270)
 colorMap = [linspace(162,0,256)', linspace(20,68,256)', linspace(47,128,256)']/256;
 colormap(colorMap);            
+
 
 if isempty(SMA_R_database)
 
